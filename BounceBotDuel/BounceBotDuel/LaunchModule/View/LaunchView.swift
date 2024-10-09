@@ -32,7 +32,7 @@ struct LaunchView: View {
                 Spacer()
             }
             .fullScreenCover(isPresented: $viewModel.showNextScreen) {
-                EmptyView()  
+                ChoicePlayerView()  
             }
         }
     }
