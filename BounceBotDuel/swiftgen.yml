@@ -1,0 +1,7 @@
+## Fonts ##
+ fonts:
+  inputs:
+     - BounceBotDuel/Fonts
+  outputs:
+     - templateName: swift5
+       output: BounceBotDuel/Generated/Fonts+Generated.swift

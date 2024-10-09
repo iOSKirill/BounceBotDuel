@@ -12,6 +12,13 @@
 		6C3A244D2CB6E4F5007E723F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6C3A244C2CB6E4F5007E723F /* Preview Assets.xcassets */; };
 		6C3A24582CB70B76007E723F /* LaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24572CB70B76007E723F /* LaunchView.swift */; };
 		6C3A245B2CB70D04007E723F /* LaunchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A245A2CB70D04007E723F /* LaunchViewModel.swift */; };
+		6C3A24622CB70F18007E723F /* ChoicePlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24612CB70F18007E723F /* ChoicePlayerView.swift */; };
+		6C3A24672CB7130A007E723F /* SupercellMagic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6C3A24662CB7130A007E723F /* SupercellMagic.ttf */; };
+		6C3A246C2CB71404007E723F /* Fonts+Generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A246B2CB71404007E723F /* Fonts+Generated.swift */; };
+		6C3A246E2CB71424007E723F /* Font+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A246D2CB71424007E723F /* Font+Extension.swift */; };
+		6C3A24702CB717E9007E723F /* ChoicePlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A246F2CB717E9007E723F /* ChoicePlayerViewModel.swift */; };
+		6C3A24722CB71AEE007E723F /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24712CB71AEE007E723F /* Color+Extension.swift */; };
+		6C3A24752CB71FFF007E723F /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24742CB71FFF007E723F /* CustomTextField.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +28,14 @@
 		6C3A244C2CB6E4F5007E723F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		6C3A24572CB70B76007E723F /* LaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchView.swift; sourceTree = "<group>"; };
 		6C3A245A2CB70D04007E723F /* LaunchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewModel.swift; sourceTree = "<group>"; };
+		6C3A24612CB70F18007E723F /* ChoicePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoicePlayerView.swift; sourceTree = "<group>"; };
+		6C3A24662CB7130A007E723F /* SupercellMagic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SupercellMagic.ttf; sourceTree = "<group>"; };
+		6C3A24682CB71327007E723F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6C3A246B2CB71404007E723F /* Fonts+Generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Fonts+Generated.swift"; sourceTree = "<group>"; };
+		6C3A246D2CB71424007E723F /* Font+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extension.swift"; sourceTree = "<group>"; };
+		6C3A246F2CB717E9007E723F /* ChoicePlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoicePlayerViewModel.swift; sourceTree = "<group>"; };
+		6C3A24712CB71AEE007E723F /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
+		6C3A24742CB71FFF007E723F /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,7 +69,11 @@
 			isa = PBXGroup;
 			children = (
 				6C3A24532CB6E7D4007E723F /* App */,
+				6C3A24692CB71388007E723F /* Generated */,
 				6C3A24542CB70B44007E723F /* LaunchModule */,
+				6C3A245C2CB70EE6007E723F /* ChoicePlayerModule */,
+				6C3A24642CB712EF007E723F /* Helpers */,
+				6C3A24632CB712DD007E723F /* Fonts */,
 				6C3A24492CB6E4F5007E723F /* Assets.xcassets */,
 				6C3A244B2CB6E4F5007E723F /* Preview Content */,
 			);
@@ -72,6 +91,7 @@
 		6C3A24532CB6E7D4007E723F /* App */ = {
 			isa = PBXGroup;
 			children = (
+				6C3A24682CB71327007E723F /* Info.plist */,
 				6C3A24452CB6E4EA007E723F /* BounceBotDuelApp.swift */,
 			);
 			path = App;
@@ -102,6 +122,73 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
+		6C3A245C2CB70EE6007E723F /* ChoicePlayerModule */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24602CB70F04007E723F /* View */,
+				6C3A245D2CB70EF4007E723F /* ViewModel */,
+			);
+			path = ChoicePlayerModule;
+			sourceTree = "<group>";
+		};
+		6C3A245D2CB70EF4007E723F /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A246F2CB717E9007E723F /* ChoicePlayerViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		6C3A24602CB70F04007E723F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24612CB70F18007E723F /* ChoicePlayerView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		6C3A24632CB712DD007E723F /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24662CB7130A007E723F /* SupercellMagic.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		6C3A24642CB712EF007E723F /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24732CB71FF1007E723F /* CustomViews */,
+				6C3A24652CB712F7007E723F /* Extensions */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		6C3A24652CB712F7007E723F /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A246D2CB71424007E723F /* Font+Extension.swift */,
+				6C3A24712CB71AEE007E723F /* Color+Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		6C3A24692CB71388007E723F /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A246B2CB71404007E723F /* Fonts+Generated.swift */,
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
+		6C3A24732CB71FF1007E723F /* CustomViews */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24742CB71FFF007E723F /* CustomTextField.swift */,
+			);
+			path = CustomViews;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -112,6 +199,7 @@
 				6C3A243E2CB6E4EA007E723F /* Sources */,
 				6C3A243F2CB6E4EA007E723F /* Frameworks */,
 				6C3A24402CB6E4EA007E723F /* Resources */,
+				6C3A246A2CB713B0007E723F /* SwiftGen */,
 			);
 			buildRules = (
 			);
@@ -162,19 +250,48 @@
 			files = (
 				6C3A244D2CB6E4F5007E723F /* Preview Assets.xcassets in Resources */,
 				6C3A244A2CB6E4F5007E723F /* Assets.xcassets in Resources */,
+				6C3A24672CB7130A007E723F /* SupercellMagic.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6C3A246A2CB713B0007E723F /* SwiftGen */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftGen;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftgen >/dev/null; then\n  swiftgen\nelse\n  echo \"warning: SwiftGen not installed, download it from https://github.com/SwiftGen/SwiftGen\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6C3A243E2CB6E4EA007E723F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C3A24622CB70F18007E723F /* ChoicePlayerView.swift in Sources */,
 				6C3A24582CB70B76007E723F /* LaunchView.swift in Sources */,
+				6C3A246E2CB71424007E723F /* Font+Extension.swift in Sources */,
 				6C3A24462CB6E4EA007E723F /* BounceBotDuelApp.swift in Sources */,
+				6C3A246C2CB71404007E723F /* Fonts+Generated.swift in Sources */,
+				6C3A24702CB717E9007E723F /* ChoicePlayerViewModel.swift in Sources */,
 				6C3A245B2CB70D04007E723F /* LaunchViewModel.swift in Sources */,
+				6C3A24722CB71AEE007E723F /* Color+Extension.swift in Sources */,
+				6C3A24752CB71FFF007E723F /* CustomTextField.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,7 +427,9 @@
 				DEVELOPMENT_ASSET_PATHS = "\"BounceBotDuel/Preview Content\"";
 				DEVELOPMENT_TEAM = 7LVP8USRP3;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BounceBotDuel/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "BounceBot Duel\n";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -345,7 +464,9 @@
 				DEVELOPMENT_ASSET_PATHS = "\"BounceBotDuel/Preview Content\"";
 				DEVELOPMENT_TEAM = 7LVP8USRP3;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BounceBotDuel/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "BounceBot Duel\n";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
