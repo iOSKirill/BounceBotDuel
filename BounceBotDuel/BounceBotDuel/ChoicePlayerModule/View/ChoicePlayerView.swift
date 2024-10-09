@@ -66,6 +66,16 @@ struct ChoicePlayerView: View {
         }
     }
     
+    // MARK: - Button Go -
+    var goButton: some View {
+        Button {
+            viewModel.saveUserData()
+        } label: {
+            Image(.goButton)
+        }
+        .padding(.bottom, 90)
+    }
+    
     // MARK: - Body -
     var body: some View {
         ZStack {
@@ -81,12 +91,7 @@ struct ChoicePlayerView: View {
                 
                 Spacer()
                 
-                Button {
-                    viewModel.saveUserData()
-                } label: {
-                    Image(.goButton)
-                }
-                .padding(.bottom, 90)
+                goButton
             }
         }
         .onAppear {
