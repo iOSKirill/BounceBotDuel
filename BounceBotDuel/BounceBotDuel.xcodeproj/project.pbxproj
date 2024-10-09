@@ -16,6 +16,9 @@
 		6C3A24672CB7130A007E723F /* SupercellMagic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6C3A24662CB7130A007E723F /* SupercellMagic.ttf */; };
 		6C3A246C2CB71404007E723F /* Fonts+Generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A246B2CB71404007E723F /* Fonts+Generated.swift */; };
 		6C3A246E2CB71424007E723F /* Font+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A246D2CB71424007E723F /* Font+Extension.swift */; };
+		6C3A24702CB717E9007E723F /* ChoicePlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A246F2CB717E9007E723F /* ChoicePlayerViewModel.swift */; };
+		6C3A24722CB71AEE007E723F /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24712CB71AEE007E723F /* Color+Extension.swift */; };
+		6C3A24752CB71FFF007E723F /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24742CB71FFF007E723F /* CustomTextField.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +33,9 @@
 		6C3A24682CB71327007E723F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6C3A246B2CB71404007E723F /* Fonts+Generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Fonts+Generated.swift"; sourceTree = "<group>"; };
 		6C3A246D2CB71424007E723F /* Font+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extension.swift"; sourceTree = "<group>"; };
+		6C3A246F2CB717E9007E723F /* ChoicePlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoicePlayerViewModel.swift; sourceTree = "<group>"; };
+		6C3A24712CB71AEE007E723F /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
+		6C3A24742CB71FFF007E723F /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +134,7 @@
 		6C3A245D2CB70EF4007E723F /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				6C3A246F2CB717E9007E723F /* ChoicePlayerViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -151,6 +158,7 @@
 		6C3A24642CB712EF007E723F /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				6C3A24732CB71FF1007E723F /* CustomViews */,
 				6C3A24652CB712F7007E723F /* Extensions */,
 			);
 			path = Helpers;
@@ -160,6 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				6C3A246D2CB71424007E723F /* Font+Extension.swift */,
+				6C3A24712CB71AEE007E723F /* Color+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -170,6 +179,14 @@
 				6C3A246B2CB71404007E723F /* Fonts+Generated.swift */,
 			);
 			path = Generated;
+			sourceTree = "<group>";
+		};
+		6C3A24732CB71FF1007E723F /* CustomViews */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24742CB71FFF007E723F /* CustomTextField.swift */,
+			);
+			path = CustomViews;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -271,7 +288,10 @@
 				6C3A246E2CB71424007E723F /* Font+Extension.swift in Sources */,
 				6C3A24462CB6E4EA007E723F /* BounceBotDuelApp.swift in Sources */,
 				6C3A246C2CB71404007E723F /* Fonts+Generated.swift in Sources */,
+				6C3A24702CB717E9007E723F /* ChoicePlayerViewModel.swift in Sources */,
 				6C3A245B2CB70D04007E723F /* LaunchViewModel.swift in Sources */,
+				6C3A24722CB71AEE007E723F /* Color+Extension.swift in Sources */,
+				6C3A24752CB71FFF007E723F /* CustomTextField.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
