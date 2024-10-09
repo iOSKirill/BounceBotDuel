@@ -11,7 +11,7 @@ import SwiftUI
 struct BounceBotDuelApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            LaunchView()
         }
     }
 }
