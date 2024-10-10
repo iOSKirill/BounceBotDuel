@@ -24,4 +24,12 @@ public extension Color {
     var cEE86FF: Color {
         Color("cEE86FF")
     }
+    /// #c32005A
+    var c32005A: Color {
+        Color("c32005A")
+    }
+    /// #c9B6FFB
+    var c9B6FFB: Color {
+        Color("c9B6FFB")
+    }
 }

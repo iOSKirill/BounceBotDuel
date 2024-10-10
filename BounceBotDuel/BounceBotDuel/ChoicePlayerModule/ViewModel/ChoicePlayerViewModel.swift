@@ -15,6 +15,8 @@ class ChoicePlayerViewModel: ObservableObject {
     @Published var selectedAvatar: String = UserDefaults.standard.string(forKey: "selectedAvatar") ?? "avatar1"
     @Published var playerName: String = UserDefaults.standard.string(forKey: "playerName") ?? "Player"
     
+    @Published var showNextScreen = false
+    
     // Save image and name user
     func saveUserData() {
         UserDefaults.standard.set(selectedAvatar, forKey: avatarKey)
