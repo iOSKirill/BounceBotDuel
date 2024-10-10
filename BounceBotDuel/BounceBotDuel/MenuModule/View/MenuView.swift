@@ -10,6 +10,7 @@ import SwiftUI
 struct MenuView: View {
     // MARK: - Property -
     @StateObject private var viewModel = MenuViewModel()
+    @EnvironmentObject var soundManager: SoundManager
    
     // MARK: - Play button -
     var playButton: some View {
@@ -67,9 +68,9 @@ struct MenuView: View {
                     HStack {
                         HStack(spacing: 8) {
                             Button {
-                                
+                                soundManager.toggleSound()
                             } label: {
-                                Image(.soundOnButton)
+                                Image(soundManager.isSoundOn ? .soundOnButton : .soundOffButton)
                             }
                             
                             Button {
