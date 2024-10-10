@@ -70,8 +70,12 @@ struct ChoicePlayerView: View {
     var goButton: some View {
         Button {
             viewModel.saveUserData()
+            viewModel.showNextScreen.toggle()
         } label: {
             Image(.goButton)
+        }
+        .fullScreenCover(isPresented: $viewModel.showNextScreen) {
+            MenuView()
         }
         .padding(.bottom, 90)
     }
