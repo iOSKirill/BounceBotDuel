@@ -23,7 +23,7 @@ struct MenuView: View {
     // MARK: - Shop, Achievements and info buttons -
     var additionalButtons: some View {
         HStack(spacing: 0) {
-            NavigationLink(destination: EmptyView()) {
+            NavigationLink(destination: InfoView()) {
                 Image(.infoButton)
             }
             .offset(x: 25)
