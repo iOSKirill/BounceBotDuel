@@ -23,6 +23,7 @@
 		6C3A247D2CB7DDDB007E723F /* MenuViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A247C2CB7DDDB007E723F /* MenuViewModel.swift */; };
 		6C3A248D2CB83322007E723F /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A248C2CB83322007E723F /* SoundManager.swift */; };
 		6C3A24902CB833C1007E723F /* backgroundMusic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6C3A248F2CB833C1007E723F /* backgroundMusic.mp3 */; };
+		6C3A24962CB83817007E723F /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24952CB83817007E723F /* InfoView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,7 @@
 		6C3A247C2CB7DDDB007E723F /* MenuViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewModel.swift; sourceTree = "<group>"; };
 		6C3A248C2CB83322007E723F /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		6C3A248F2CB833C1007E723F /* backgroundMusic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = backgroundMusic.mp3; sourceTree = "<group>"; };
+		6C3A24952CB83817007E723F /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +84,7 @@
 				6C3A24542CB70B44007E723F /* LaunchModule */,
 				6C3A245C2CB70EE6007E723F /* ChoicePlayerModule */,
 				6C3A24762CB72697007E723F /* MenuModule */,
+				6C3A24912CB837D7007E723F /* InfoModule */,
 				6C3A248E2CB833B1007E723F /* Music */,
 				6C3A24642CB712EF007E723F /* Helpers */,
 				6C3A24632CB712DD007E723F /* Fonts */,
@@ -241,6 +244,22 @@
 			path = Music;
 			sourceTree = "<group>";
 		};
+		6C3A24912CB837D7007E723F /* InfoModule */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24922CB837F8007E723F /* View */,
+			);
+			path = InfoModule;
+			sourceTree = "<group>";
+		};
+		6C3A24922CB837F8007E723F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24952CB83817007E723F /* InfoView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -341,6 +360,7 @@
 				6C3A246E2CB71424007E723F /* Font+Extension.swift in Sources */,
 				6C3A24462CB6E4EA007E723F /* BounceBotDuelApp.swift in Sources */,
 				6C3A246C2CB71404007E723F /* Fonts+Generated.swift in Sources */,
+				6C3A24962CB83817007E723F /* InfoView.swift in Sources */,
 				6C3A248D2CB83322007E723F /* SoundManager.swift in Sources */,
 				6C3A247D2CB7DDDB007E723F /* MenuViewModel.swift in Sources */,
 				6C3A24792CB726AB007E723F /* MenuView.swift in Sources */,
