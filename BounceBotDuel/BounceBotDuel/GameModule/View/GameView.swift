@@ -8,132 +8,19 @@
 import SwiftUI
 
 struct GameView: View {
-    // MARK: - Property -
-    @StateObject var viewModel = GameViewModel()
     @EnvironmentObject var soundManager: SoundManager
-    @Environment(\.dismiss) var dismiss
-    
-    // MARK: - Navigation Bar -
-    var navigationBar: some View {
-        HStack {
-            ZStack {
-                Image(.block6)
-            }
-            .blur(radius: viewModel.isSettingsPanelVisible ? 5 : 0)
 
-            Spacer()
-
-            ZStack(alignment: .trailing) {
-                if viewModel.isSettingsPanelVisible {
-                    HStack {
-                        HStack(spacing: 8) {
-                            Button {
-                                dismiss()
-                            } label: {
-                                Image(.homeButton)
-                            }
-
-                            Button {
-                                // Restart action
-                            } label: {
-                                Image(.restartButton)
-                            }
-
-                            Button {
-                                soundManager.toggleSound()
-                            } label: {
-                                Image(soundManager.isSoundOn ? .soundOnButton : .soundOffButton)
-                            }
-                            .padding(.trailing, 50)
-                        }
-                        .padding(6)
-                    }
-                    .background(.c32005A.opacity(0.5))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 18)
-                            .stroke(Color.c9B6FFB, lineWidth: 4)
-                    )
-                    .cornerRadius(18)
-                    .animation(.easeInOut(duration: 0.3), value: viewModel.isSettingsPanelVisible)
-                }
-
-                Button {
-                    withAnimation {
-                        viewModel.isSettingsPanelVisible.toggle()
-                    }
-                } label: {
-                    Image(.pauseButton)
-                }
-                .offset(x: 10, y: 2)
-            }
-        }
-        .padding(.horizontal, 24)
-    }
     var scene: SKScene {
-            let scene = GameScene()
-            scene.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-            scene.scaleMode = .resizeFill
-            return scene
-        }
-    // MARK: - Body -
+        let scene = GameScene(soundManager: soundManager)
+        scene.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        scene.scaleMode = .resizeFill
+        return scene
+    }
+
     var body: some View {
         ZStack {
-            ZStack {
-                Image(.background1)
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
-                
-                if viewModel.isSettingsPanelVisible {
-                    Color.black.opacity(0.4)
-                        .ignoresSafeArea()
-                }
-            }
-            
-            VStack {
-                GeometryReader { geometry in
-
-                    VStack {
-                        navigationBar
-                            .padding(.top, geometry.safeAreaInsets.top + viewModel.topPadding)
-                        
-                        HStack {
-                            ZStack(alignment: .center) {
-                                Image(.block3)
-                                
-                                Image(viewModel.playerAvatar)
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                                    .cornerRadius(10)
-                                    .padding(.bottom, 3)
-                            }
-                            
-                            VStack {
-                                Text(viewModel.playerName)
-                                    .font(.appBold(of: 16))
-                                    .foregroundColor(.cF4F7EE)
-                                
-                                Image(.life3)
-                            }
-                            .offset(y: -5)
-                            .padding(.trailing, 8)
-                            
-                            Spacer()
-                        }
-                        .padding(.horizontal, 24)
-                        .blur(radius: viewModel.isSettingsPanelVisible ? 5 : 0)
-                        
-                        Spacer()
-                        
-                        SpriteView(scene: scene)
-
-                        Spacer()
-                    }
-                        
-                }
-            }
-            // Apply blur to everything except the settings panel
-
+            SpriteView(scene: scene)
+                .ignoresSafeArea()
         }
         .navigationBarBackButtonHidden(true)
     }
@@ -144,10 +31,13 @@ struct GameView: View {
         .environmentObject(SoundManager())
 }
 
+
 import SpriteKit
+import UIKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     
+    var soundManager: SoundManager
     var capsule: SKSpriteNode!
     var coin: SKSpriteNode!
     var playerBall: SKSpriteNode!
@@ -156,7 +46,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var ballInPlay = false
     var playerScore = 0
     var playerScoreLabel: SKLabelNode!
+    var playerNameLabel: SKLabelNode!
+    var pauseButton: SKSpriteNode!
+    var settingsPanel: SKSpriteNode!
+    var soundButton: SKSpriteNode!
+    var restartButton: SKSpriteNode!
+    var homeButton: SKSpriteNode!
     var background: SKSpriteNode!
+    var isSettingsPanelVisible = false
+    var level = 1 // Текущий уровень
+    var botScore = 0
+    var botScoreLabel: SKLabelNode!
+    var botAttemptCount = 0
 
     struct PhysicsCategory {
         static let none: UInt32 = 0
@@ -164,44 +65,75 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         static let botBall: UInt32 = 0b10
         static let coin: UInt32 = 0b100
     }
+    
+    // Массив с фиксированными позициями для первого уровня
+    let level1Pins: [CGPoint] = [
+        CGPoint(x: 120, y: 700),
+        CGPoint(x: 200, y: 700),
+        CGPoint(x: 280, y: 700),
+        CGPoint(x: 360, y: 700),
+        
+        CGPoint(x: 160, y: 640),
+        CGPoint(x: 240, y: 640),
+        CGPoint(x: 320, y: 640),
+
+        CGPoint(x: 120, y: 580),
+        CGPoint(x: 200, y: 580),
+        CGPoint(x: 280, y: 580),
+        CGPoint(x: 360, y: 580),
+
+        CGPoint(x: 160, y: 520),
+        CGPoint(x: 240, y: 520),
+        CGPoint(x: 320, y: 520),
+
+        CGPoint(x: 120, y: 460),
+        CGPoint(x: 200, y: 460),
+        CGPoint(x: 280, y: 460),
+        CGPoint(x: 360, y: 460),
+    ]
+
+    // MARK: - Initializer with SoundManager
+    init(soundManager: SoundManager) {
+        self.soundManager = soundManager
+        super.init(size: CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func didMove(to view: SKView) {
+        setupBackground()
+        setupCapsule()
+        setupObstaclesForLevel()
+        setupCoinForLevel()
+        setupScoreLabel()
+        setupBotScoreLabel()  // Добавляем отображение счета бота
+        setupPlayerNameLabel()
+        setupPauseButton()
+        physicsWorld.gravity = CGVector(dx: 0, dy: -4.8)
+        physicsWorld.contactDelegate = self
+    }
+
+    // Setup Background
+    func setupBackground() {
         background = SKSpriteNode(imageNamed: "Background1")
         background.size = self.size
         background.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         background.zPosition = -1
         addChild(background)
-        physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-        physicsWorld.contactDelegate = self
-        
-        setupCapsule()
-        setupCoin()
-        setupObstacles()
-        setupScoreLabel()
     }
     
-    // Setup the capsule where balls will drop from
-    func setupCapsule() {
-        capsule = SKSpriteNode(imageNamed: "Pipe")
-        capsule.position = CGPoint(x: size.width / 2, y: size.height - 50)
-        capsule.physicsBody = SKPhysicsBody(rectangleOf: capsule.size)
-        capsule.physicsBody?.isDynamic = false
-        addChild(capsule)
+    // Setup Player Name label
+    func setupPlayerNameLabel() {
+        playerNameLabel = SKLabelNode(text: "Player")
+        playerNameLabel.fontSize = 20
+        playerNameLabel.fontColor = .white
+        playerNameLabel.position = CGPoint(x: size.width * 0.2, y: size.height - 50)
+        addChild(playerNameLabel)
     }
-    
-    // Setup the single coin
-    func setupCoin() {
-        coin = SKSpriteNode(imageNamed: "Coin")
-        let randomX = CGFloat.random(in: 50...size.width - 50)
-        coin.position = CGPoint(x: randomX, y: 100) // Place coin near the bottom
-        coin.physicsBody = SKPhysicsBody(circleOfRadius: coin.size.width / 2)
-        coin.physicsBody?.isDynamic = false
-        coin.physicsBody?.categoryBitMask = PhysicsCategory.coin
-        coin.physicsBody?.contactTestBitMask = PhysicsCategory.playerBall | PhysicsCategory.botBall
-        addChild(coin)
-    }
-    
-    // Setup the score label
+
+    // Setup Score Label
     func setupScoreLabel() {
         playerScoreLabel = SKLabelNode(text: "Score: \(playerScore)")
         playerScoreLabel.fontSize = 24
@@ -210,91 +142,239 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(playerScoreLabel)
     }
     
-    // Create obstacles in a grid pattern (like Plinko pegs)
-    func setupObstacles() {
-        let rows = 5
-        let cols = 7
-        let spacingX: CGFloat = size.width / CGFloat(cols + 1)
-        let spacingY: CGFloat = size.height / CGFloat(rows + 3)
-        
-        for row in 0..<rows {
-            for col in 0..<cols {
-                let peg = SKSpriteNode(imageNamed: "Pin")
-                peg.size = CGSize(width: 20, height: 20)
-                let offsetX = (row % 2 == 0) ? spacingX / 2 : 0
-                let positionX = spacingX * CGFloat(col) + offsetX + spacingX / 2
-                let positionY = size.height - (spacingY * CGFloat(row + 2))
-                
-                peg.position = CGPoint(x: positionX, y: positionY)
-                peg.physicsBody = SKPhysicsBody(circleOfRadius: peg.size.width / 2)
-                peg.physicsBody?.isDynamic = false
-                peg.physicsBody?.restitution = 0.8
-                addChild(peg)
-                obstacles.append(peg)
-            }
+    func setupBotScoreLabel() {
+        botScoreLabel = SKLabelNode(text: "Bot Score: \(botScore)")
+        botScoreLabel.fontSize = 24
+        botScoreLabel.fontColor = .white
+        botScoreLabel.position = CGPoint(x: size.width / 2, y: size.height - 140)
+        addChild(botScoreLabel)
+    }
+    
+    // Setup Pause Button
+    func setupPauseButton() {
+        pauseButton = SKSpriteNode(imageNamed: "PauseButton")
+        pauseButton.position = CGPoint(x: size.width - 50, y: size.height - 50)
+        addChild(pauseButton)
+    }
+    
+    // Setup Capsule where balls drop from
+    func setupCapsule() {
+        capsule = SKSpriteNode(imageNamed: "Pipe")
+        capsule.position = CGPoint(x: size.width / 2, y: size.height - 50)
+        addChild(capsule)
+    }
+
+    // Setup obstacles (pins) for level 1
+    func setupObstaclesForLevel() {
+        for position in level1Pins {
+            let peg = SKSpriteNode(imageNamed: "Pin")
+            peg.size = CGSize(width: 20, height: 20)
+            peg.position = position
+            peg.physicsBody = SKPhysicsBody(circleOfRadius: peg.size.width / 2)
+            peg.physicsBody?.isDynamic = false
+            peg.physicsBody?.restitution = 0.8
+            addChild(peg)
+            obstacles.append(peg)
         }
     }
     
-    // Launch both player's and bot's balls from the same position
+    // Setup coin for level 1
+    func setupCoinForLevel() {
+        // Выбираем случайное место для монеты
+        let randomIndex = Int.random(in: 0..<level1Pins.count)
+        let coinPosition = level1Pins[randomIndex]
+        
+        coin = SKSpriteNode(imageNamed: "Coin")
+        coin.position = coinPosition
+        coin.physicsBody = SKPhysicsBody(circleOfRadius: coin.size.width / 2)
+        coin.physicsBody?.isDynamic = false
+        coin.physicsBody?.categoryBitMask = PhysicsCategory.coin
+        coin.physicsBody?.contactTestBitMask = PhysicsCategory.playerBall | PhysicsCategory.botBall
+        addChild(coin)
+    }
+    
+    // Setup coin for level 1
+    func generateNewCoin() {
+        // Удаляем старую монету, если она существует
+        coin?.removeFromParent()
+        
+        // Выбираем случайное место для новой монеты
+        let randomIndex = Int.random(in: 0..<level1Pins.count)
+        let coinPosition = level1Pins[randomIndex]
+        
+        coin = SKSpriteNode(imageNamed: "Coin")
+        coin.position = coinPosition
+        coin.physicsBody = SKPhysicsBody(circleOfRadius: coin.size.width / 2)
+        coin.physicsBody?.isDynamic = false
+        coin.physicsBody?.categoryBitMask = PhysicsCategory.coin
+        coin.physicsBody?.contactTestBitMask = PhysicsCategory.playerBall | PhysicsCategory.botBall
+        addChild(coin)
+    }
+
+    
+    // Launch balls (player & bot)
     func launchBalls() {
         guard !ballInPlay else { return }
         
-        // Launch Player Ball
+        // Player Ball
         playerBall = SKSpriteNode(imageNamed: "PlayerBall")
         playerBall.position = capsule.position
         playerBall.physicsBody = SKPhysicsBody(circleOfRadius: playerBall.size.width / 2)
         playerBall.physicsBody?.restitution = 0.5
-        playerBall.physicsBody?.linearDamping = 0.3
+        playerBall.physicsBody?.linearDamping = 1.0
         playerBall.physicsBody?.categoryBitMask = PhysicsCategory.playerBall
         playerBall.physicsBody?.contactTestBitMask = PhysicsCategory.coin
         addChild(playerBall)
         
-        // Launch Bot Ball
+        // Bot Ball
         botBall = SKSpriteNode(imageNamed: "BotBall")
         botBall.position = capsule.position
         botBall.physicsBody = SKPhysicsBody(circleOfRadius: botBall.size.width / 2)
         botBall.physicsBody?.restitution = 0.5
-        botBall.physicsBody?.linearDamping = 0.3
+        botBall.physicsBody?.linearDamping = 1.0
         botBall.physicsBody?.categoryBitMask = PhysicsCategory.botBall
         addChild(botBall)
         
-        // Apply forces to both balls
-        playerBall.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -10))
-        botBall.physicsBody?.applyImpulse(CGVector(dx: CGFloat.random(in: -5...5), dy: -10))
+        // Увеличиваем счетчик попыток бота
+        botAttemptCount += 1
+
+        // Логика для бота
+        if botAttemptCount % 3 == 0 {
+            // Если это третья попытка, бот точно попадает в монету
+            let dx = (coin.position.x - botBall.position.x) * 0.03  // Уменьшаем силу по оси X
+            let dy = (coin.position.y - botBall.position.y) * 0.02  // Также добавляем контроль по оси Y
+            botBall.physicsBody?.applyImpulse(CGVector(dx: dx, dy: dy)) // Точное попадание в монету
+        } else {
+            // Если это не третья попытка, бот может промахнуться
+            botBall.physicsBody?.applyImpulse(CGVector(dx: CGFloat.random(in: -2...2), dy: -5))
+        }
+        
+        // Логика для игрока (чаще попадает)
+        let playerShouldHit = Int.random(in: 1...5) <= 4 // Игрок попадает в 4 из 5 попыток
+        
+        if playerShouldHit {
+            // Игрок точно попадает в монету
+            let dx = (coin.position.x - playerBall.position.x) * 0.03  // Уменьшаем силу по оси X
+            let dy = (coin.position.y - playerBall.position.y) * 0.02  // Также добавляем контроль по оси Y
+            playerBall.physicsBody?.applyImpulse(CGVector(dx: dx, dy: dy)) // Точное попадание в монету
+        } else {
+            // Иногда игрок может промахнуться
+            playerBall.physicsBody?.applyImpulse(CGVector(dx: CGFloat.random(in: -1...1), dy: -5))
+        }
         
         ballInPlay = true
     }
-    
-    // Handle touches to launch balls
+
+    // Handle Touches to Launch Balls
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        launchBalls()
+        guard let touch = touches.first else { return }
+        let location = touch.location(in: self)
+        
+        // Check if pause button is pressed
+        if pauseButton.contains(location) {
+            toggleSettingsPanel()
+        } else if !isSettingsPanelVisible {
+            // Launch balls if the settings panel is not visible
+            launchBalls()
+        }
     }
-    
-    // Collision detection between balls and the coin
+
+    // Toggle Settings Panel
+    func toggleSettingsPanel() {
+        isSettingsPanelVisible.toggle()
+        if isSettingsPanelVisible {
+            showSettingsPanel()
+        } else {
+            hideSettingsPanel()
+        }
+    }
+
+    // Show Settings Panel
+    func showSettingsPanel() {
+        settingsPanel = SKSpriteNode(color: .black, size: CGSize(width: size.width * 0.8, height: size.height * 0.3))
+        settingsPanel.alpha = 0.5
+        settingsPanel.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        addChild(settingsPanel)
+        
+        // Home Button
+        homeButton = SKSpriteNode(imageNamed: "HomeButton")
+        homeButton.position = CGPoint(x: settingsPanel.position.x - 60, y: settingsPanel.position.y)
+        addChild(homeButton)
+        
+        // Restart Button
+        restartButton = SKSpriteNode(imageNamed: "RestartButton")
+        restartButton.position = CGPoint(x: settingsPanel.position.x, y: settingsPanel.position.y)
+        addChild(restartButton)
+        
+        // Sound Button
+        soundButton = SKSpriteNode(imageNamed: soundManager.isSoundOn ? "SoundOnButton" : "SoundOffButton")
+        soundButton.position = CGPoint(x: settingsPanel.position.x + 60, y: settingsPanel.position.y)
+        addChild(soundButton)
+    }
+
+    // Hide Settings Panel
+    func hideSettingsPanel() {
+        settingsPanel.removeFromParent()
+        homeButton.removeFromParent()
+        restartButton.removeFromParent()
+        soundButton.removeFromParent()
+    }
+
+    // Handle Ball-coin collision
+    // Handle Ball-coin collision
     func didBegin(_ contact: SKPhysicsContact) {
         let firstBody = contact.bodyA
         let secondBody = contact.bodyB
         
+        // Столкновение игрока с монетой
         if (firstBody.categoryBitMask == PhysicsCategory.playerBall && secondBody.categoryBitMask == PhysicsCategory.coin) ||
            (firstBody.categoryBitMask == PhysicsCategory.coin && secondBody.categoryBitMask == PhysicsCategory.playerBall) {
             playerScore += 1
             updateScore()
+            
+            // Удаляем монету из сцены
+            if secondBody.categoryBitMask == PhysicsCategory.coin {
+                secondBody.node?.removeFromParent()
+            } else if firstBody.categoryBitMask == PhysicsCategory.coin {
+                firstBody.node?.removeFromParent()
+            }
+        }
+        
+        // Столкновение бота с монетой
+        if (firstBody.categoryBitMask == PhysicsCategory.botBall && secondBody.categoryBitMask == PhysicsCategory.coin) ||
+           (firstBody.categoryBitMask == PhysicsCategory.coin && secondBody.categoryBitMask == PhysicsCategory.botBall) {
+            botScore += 1
+            updateBotScore()
+            
+            // Удаляем монету из сцены
+            if secondBody.categoryBitMask == PhysicsCategory.coin {
+                secondBody.node?.removeFromParent()
+            } else if firstBody.categoryBitMask == PhysicsCategory.coin {
+                firstBody.node?.removeFromParent()
+            }
         }
     }
-    
-    // Update score display
+
+
+    func updateBotScore() {
+        botScoreLabel.text = "Bot Score: \(botScore)"
+    }
+
+    // Update Score Display
     func updateScore() {
         playerScoreLabel.text = "Score: \(playerScore)"
     }
-    
+
     override func update(_ currentTime: TimeInterval) {
-        // Check if both balls have fallen off the screen
+        // Проверяем, если оба шара упали за пределы экрана
         if ballInPlay && playerBall.position.y < 0 && botBall.position.y < 0 {
             ballInPlay = false
             playerBall.removeFromParent()
             botBall.removeFromParent()
-            // Allow the player to launch balls again
+
+            // Генерация новой монеты только после окончания броска
+            generateNewCoin()
         }
     }
-}
 
+}
