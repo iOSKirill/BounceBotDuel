@@ -36,7 +36,7 @@ import SpriteKit
 import UIKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
-    
+
     var soundManager: SoundManager
     var capsule: SKSpriteNode!
     var coin: SKSpriteNode!
@@ -54,50 +54,34 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var homeButton: SKSpriteNode!
     var background: SKSpriteNode!
     var isSettingsPanelVisible = false
-    var level = 1 // Текущий уровень
+    var level = 1
     var botScore = 0
     var botScoreLabel: SKLabelNode!
     var botAttemptCount = 0
-
+    
+    var playerLives = 3
+    var lifeIndicator: SKSpriteNode! // Теперь только один индикатор жизни
+    
     struct PhysicsCategory {
         static let none: UInt32 = 0
         static let playerBall: UInt32 = 0b1
         static let botBall: UInt32 = 0b10
         static let coin: UInt32 = 0b100
     }
-    
-    // Массив с фиксированными позициями для первого уровня
-    let level1Pins: [CGPoint] = [
-        CGPoint(x: 120, y: 700),
-        CGPoint(x: 200, y: 700),
-        CGPoint(x: 280, y: 700),
-        CGPoint(x: 360, y: 700),
-        
-        CGPoint(x: 160, y: 640),
-        CGPoint(x: 240, y: 640),
-        CGPoint(x: 320, y: 640),
 
-        CGPoint(x: 120, y: 580),
-        CGPoint(x: 200, y: 580),
-        CGPoint(x: 280, y: 580),
-        CGPoint(x: 360, y: 580),
-
-        CGPoint(x: 160, y: 520),
-        CGPoint(x: 240, y: 520),
-        CGPoint(x: 320, y: 520),
-
-        CGPoint(x: 120, y: 460),
-        CGPoint(x: 200, y: 460),
-        CGPoint(x: 280, y: 460),
-        CGPoint(x: 360, y: 460),
+    let level1RelativePins: [CGPoint] = [
+        CGPoint(x: -2, y: 3), CGPoint(x: -1, y: 3), CGPoint(x: 0, y: 3), CGPoint(x: 1, y: 3), CGPoint(x: 2, y: 3),
+        CGPoint(x: -1.5, y: 2.5), CGPoint(x: -0.5, y: 2.5), CGPoint(x: 0.5, y: 2.5), CGPoint(x: 1.5, y: 2.5),
+        CGPoint(x: -2, y: 2), CGPoint(x: -1, y: 2), CGPoint(x: 0, y: 2), CGPoint(x: 1, y: 2), CGPoint(x: 2, y: 2),
+        CGPoint(x: -1.5, y: 1.5), CGPoint(x: -0.5, y: 1.5), CGPoint(x: 0.5, y: 1.5), CGPoint(x: 1.5, y: 1.5),
+        CGPoint(x: -2, y: 1), CGPoint(x: -1, y: 1), CGPoint(x: 0, y: 1), CGPoint(x: 1, y: 1), CGPoint(x: 2, y: 1)
     ]
 
-    // MARK: - Initializer with SoundManager
     init(soundManager: SoundManager) {
         self.soundManager = soundManager
         super.init(size: CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -108,9 +92,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         setupObstaclesForLevel()
         setupCoinForLevel()
         setupScoreLabel()
-        setupBotScoreLabel()  // Добавляем отображение счета бота
+        setupBotScoreLabel()
         setupPlayerNameLabel()
         setupPauseButton()
+        setupPlayerLives()  // Инициализация одного индикатора жизни
         physicsWorld.gravity = CGVector(dx: 0, dy: -4.8)
         physicsWorld.contactDelegate = self
     }
@@ -123,7 +108,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         background.zPosition = -1
         addChild(background)
     }
-    
+
     // Setup Player Name label
     func setupPlayerNameLabel() {
         playerNameLabel = SKLabelNode(text: "Player")
@@ -141,7 +126,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         playerScoreLabel.position = CGPoint(x: size.width / 2, y: size.height - 100)
         addChild(playerScoreLabel)
     }
-    
+
     func setupBotScoreLabel() {
         botScoreLabel = SKLabelNode(text: "Bot Score: \(botScore)")
         botScoreLabel.fontSize = 24
@@ -149,26 +134,45 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         botScoreLabel.position = CGPoint(x: size.width / 2, y: size.height - 140)
         addChild(botScoreLabel)
     }
-    
+
     // Setup Pause Button
     func setupPauseButton() {
         pauseButton = SKSpriteNode(imageNamed: "PauseButton")
         pauseButton.position = CGPoint(x: size.width - 50, y: size.height - 50)
         addChild(pauseButton)
     }
-    
+
     // Setup Capsule where balls drop from
     func setupCapsule() {
         capsule = SKSpriteNode(imageNamed: "Pipe")
-        capsule.position = CGPoint(x: size.width / 2, y: size.height - 50)
+        capsule.position = CGPoint(x: size.width / 2, y: size.height / 1.4)
         addChild(capsule)
     }
 
-    // Setup obstacles (pins) for level 1
+    // Преобразование относительных координат пинов в абсолютные с учетом размера экрана
+    func generateLevelPins(relativePositions: [CGPoint], screenWidth: CGFloat, maxPinsInRow: Int) -> [CGPoint] {
+        let pinSpacingX = screenWidth / CGFloat(maxPinsInRow + 0)
+        let pinSpacingY = pinSpacingX * 1.2
+        let centerX = screenWidth / 2
+        let centerY = size.height / 4.2
+
+        return relativePositions.map { relativePos in
+            let x = centerX + relativePos.x * pinSpacingX
+            let y = centerY + relativePos.y * pinSpacingY
+            return CGPoint(x: x, y: y)
+        }
+    }
+
+    // Setup obstacles (pins) для текущего уровня
     func setupObstaclesForLevel() {
-        for position in level1Pins {
+        let screenWidth = self.size.width
+        let maxPinsInRow = 5
+
+        let levelPins = generateLevelPins(relativePositions: level1RelativePins, screenWidth: screenWidth, maxPinsInRow: maxPinsInRow)
+
+        for position in levelPins {
             let peg = SKSpriteNode(imageNamed: "Pin")
-            peg.size = CGSize(width: 20, height: 20)
+            peg.size = CGSize(width: 20, height: 28)
             peg.position = position
             peg.physicsBody = SKPhysicsBody(circleOfRadius: peg.size.width / 2)
             peg.physicsBody?.isDynamic = false
@@ -177,31 +181,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             obstacles.append(peg)
         }
     }
-    
-    // Setup coin for level 1
+
+    // Setup coin для текущего уровня
     func setupCoinForLevel() {
-        // Выбираем случайное место для монеты
-        let randomIndex = Int.random(in: 0..<level1Pins.count)
-        let coinPosition = level1Pins[randomIndex]
-        
-        coin = SKSpriteNode(imageNamed: "Coin")
-        coin.position = coinPosition
-        coin.physicsBody = SKPhysicsBody(circleOfRadius: coin.size.width / 2)
-        coin.physicsBody?.isDynamic = false
-        coin.physicsBody?.categoryBitMask = PhysicsCategory.coin
-        coin.physicsBody?.contactTestBitMask = PhysicsCategory.playerBall | PhysicsCategory.botBall
-        addChild(coin)
-    }
-    
-    // Setup coin for level 1
-    func generateNewCoin() {
-        // Удаляем старую монету, если она существует
-        coin?.removeFromParent()
-        
-        // Выбираем случайное место для новой монеты
-        let randomIndex = Int.random(in: 0..<level1Pins.count)
-        let coinPosition = level1Pins[randomIndex]
-        
+        let randomIndex = Int.random(in: 0..<obstacles.count)
+        let coinPosition = obstacles[randomIndex].position
+
         coin = SKSpriteNode(imageNamed: "Coin")
         coin.position = coinPosition
         coin.physicsBody = SKPhysicsBody(circleOfRadius: coin.size.width / 2)
@@ -211,11 +196,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(coin)
     }
 
-    
-    // Launch balls (player & bot)
+    // Setup Player Lives
+    func setupPlayerLives() {
+        lifeIndicator = SKSpriteNode(imageNamed: "Life3") // Начинаем с полной жизнью (зеленая)
+        lifeIndicator.size = CGSize(width: 70, height: 20)
+        lifeIndicator.position = CGPoint(x: size.width * 0.1, y: size.height - 80)
+        addChild(lifeIndicator)
+    }
+
+    // Обновление текстуры индикатора жизней в зависимости от оставшихся жизней
+    func updatePlayerLives() {
+        if playerLives == 3 {
+            lifeIndicator.texture = SKTexture(imageNamed: "Life3")
+        } else if playerLives == 2 {
+            lifeIndicator.texture = SKTexture(imageNamed: "Life2")
+        } else if playerLives == 1 {
+            lifeIndicator.texture = SKTexture(imageNamed: "Life1")
+        } else {
+            lifeIndicator.texture = SKTexture(imageNamed: "EmptyLife") // Пустая жизнь, игрок проиграл
+        }
+    }
+
     func launchBalls() {
         guard !ballInPlay else { return }
-        
+
         // Player Ball
         playerBall = SKSpriteNode(imageNamed: "PlayerBall")
         playerBall.position = capsule.position
@@ -225,7 +229,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         playerBall.physicsBody?.categoryBitMask = PhysicsCategory.playerBall
         playerBall.physicsBody?.contactTestBitMask = PhysicsCategory.coin
         addChild(playerBall)
-        
+
         // Bot Ball
         botBall = SKSpriteNode(imageNamed: "BotBall")
         botBall.position = capsule.position
@@ -234,52 +238,53 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         botBall.physicsBody?.linearDamping = 1.0
         botBall.physicsBody?.categoryBitMask = PhysicsCategory.botBall
         addChild(botBall)
-        
-        // Увеличиваем счетчик попыток бота
+
         botAttemptCount += 1
 
-        // Логика для бота
-        if botAttemptCount % 3 == 0 {
-            // Если это третья попытка, бот точно попадает в монету
-            let dx = (coin.position.x - botBall.position.x) * 0.03  // Уменьшаем силу по оси X
-            let dy = (coin.position.y - botBall.position.y) * 0.02  // Также добавляем контроль по оси Y
-            botBall.physicsBody?.applyImpulse(CGVector(dx: dx, dy: dy)) // Точное попадание в монету
+        let playerRandomSpeedX = CGFloat.random(in: -3...3)
+        let botRandomSpeedX = CGFloat.random(in: -3...3)
+
+        // Логика для игрока
+        let shouldPlayerMiss = Int.random(in: 1...5) == 5 // Промах в 1 из 5 попыток
+
+        if shouldPlayerMiss {
+            playerBall.physicsBody?.applyImpulse(CGVector(dx: playerRandomSpeedX, dy: -5))
+            playerLives -= 1
+       
         } else {
-            // Если это не третья попытка, бот может промахнуться
-            botBall.physicsBody?.applyImpulse(CGVector(dx: CGFloat.random(in: -2...2), dy: -5))
+            let dx = (coin.position.x - playerBall.position.x) * 0.03 + playerRandomSpeedX
+            let dy = (coin.position.y - playerBall.position.y) * 0.02
+            playerBall.physicsBody?.applyImpulse(CGVector(dx: dx, dy: dy))
         }
-        
-        // Логика для игрока (чаще попадает)
-        let playerShouldHit = Int.random(in: 1...5) <= 4 // Игрок попадает в 4 из 5 попыток
-        
-        if playerShouldHit {
-            // Игрок точно попадает в монету
-            let dx = (coin.position.x - playerBall.position.x) * 0.03  // Уменьшаем силу по оси X
-            let dy = (coin.position.y - playerBall.position.y) * 0.02  // Также добавляем контроль по оси Y
-            playerBall.physicsBody?.applyImpulse(CGVector(dx: dx, dy: dy)) // Точное попадание в монету
+
+        let shouldBotHit = Int.random(in: 1...3) == 3
+
+        if shouldBotHit {
+            let dx = (coin.position.x - botBall.position.x) * 0.03 + botRandomSpeedX
+            let dy = (coin.position.y - botBall.position.y) * 0.02
+            botBall.physicsBody?.applyImpulse(CGVector(dx: dx, dy: dy))
         } else {
-            // Иногда игрок может промахнуться
-            playerBall.physicsBody?.applyImpulse(CGVector(dx: CGFloat.random(in: -1...1), dy: -5))
+            botBall.physicsBody?.applyImpulse(CGVector(dx: botRandomSpeedX, dy: -5))
         }
-        
+
         ballInPlay = true
     }
 
-    // Handle Touches to Launch Balls
+    func gameOver() {
+        print("Game Over! Player has no lives left.")
+    }
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
-        
-        // Check if pause button is pressed
+
         if pauseButton.contains(location) {
             toggleSettingsPanel()
         } else if !isSettingsPanelVisible {
-            // Launch balls if the settings panel is not visible
             launchBalls()
         }
     }
 
-    // Toggle Settings Panel
     func toggleSettingsPanel() {
         isSettingsPanelVisible.toggle()
         if isSettingsPanelVisible {
@@ -289,30 +294,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
 
-    // Show Settings Panel
     func showSettingsPanel() {
         settingsPanel = SKSpriteNode(color: .black, size: CGSize(width: size.width * 0.8, height: size.height * 0.3))
         settingsPanel.alpha = 0.5
         settingsPanel.position = CGPoint(x: size.width / 2, y: size.height / 2)
         addChild(settingsPanel)
-        
-        // Home Button
+
         homeButton = SKSpriteNode(imageNamed: "HomeButton")
         homeButton.position = CGPoint(x: settingsPanel.position.x - 60, y: settingsPanel.position.y)
         addChild(homeButton)
-        
-        // Restart Button
+
         restartButton = SKSpriteNode(imageNamed: "RestartButton")
         restartButton.position = CGPoint(x: settingsPanel.position.x, y: settingsPanel.position.y)
         addChild(restartButton)
-        
-        // Sound Button
+
         soundButton = SKSpriteNode(imageNamed: soundManager.isSoundOn ? "SoundOnButton" : "SoundOffButton")
         soundButton.position = CGPoint(x: settingsPanel.position.x + 60, y: settingsPanel.position.y)
         addChild(soundButton)
     }
 
-    // Hide Settings Panel
     func hideSettingsPanel() {
         settingsPanel.removeFromParent()
         homeButton.removeFromParent()
@@ -320,33 +320,78 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         soundButton.removeFromParent()
     }
 
-    // Handle Ball-coin collision
-    // Handle Ball-coin collision
+    var playerHitCoin = false // Переменная для отслеживания попадания игрока
+
+    override func update(_ currentTime: TimeInterval) {
+        // Проверяем, упали ли оба шара
+        if ballInPlay && playerBall.position.y < 0 && botBall.position.y < 0 {
+            ballInPlay = false
+
+            // Убираем шары с экрана
+            playerBall.removeFromParent()
+            botBall.removeFromParent()
+
+            // Если игрок попал в монету
+            if playerHitCoin {
+                // Игрок попал, продолжаем игру
+                generateNewCoin()
+                playerHitCoin = false // Сброс флага
+            } else {
+                // Игрок промахнулся, уменьшаем жизни
+                playerLives -= 1
+                updatePlayerLives()
+
+                if playerLives <= 0 {
+                    // Отображаем текст Game Over
+                    showGameOver()
+                } else {
+                    // Генерируем новую монету для следующего раунда
+                    generateNewCoin()
+                }
+            }
+        }
+    }
+
+
+    func generateNewCoin() {
+        coin?.removeFromParent()
+        let randomIndex = Int.random(in: 0..<obstacles.count)
+        let coinPosition = obstacles[randomIndex].position
+
+        coin = SKSpriteNode(imageNamed: "Coin")
+        coin.position = coinPosition
+        coin.physicsBody = SKPhysicsBody(circleOfRadius: coin.size.width / 2)
+        coin.physicsBody?.isDynamic = false
+        coin.physicsBody?.categoryBitMask = PhysicsCategory.coin
+        coin.physicsBody?.contactTestBitMask = PhysicsCategory.playerBall | PhysicsCategory.botBall
+        addChild(coin)
+    }
+
     func didBegin(_ contact: SKPhysicsContact) {
         let firstBody = contact.bodyA
         let secondBody = contact.bodyB
-        
-        // Столкновение игрока с монетой
+
+        // Проверка на контакт шара игрока с монетой
         if (firstBody.categoryBitMask == PhysicsCategory.playerBall && secondBody.categoryBitMask == PhysicsCategory.coin) ||
-           (firstBody.categoryBitMask == PhysicsCategory.coin && secondBody.categoryBitMask == PhysicsCategory.playerBall) {
+            (firstBody.categoryBitMask == PhysicsCategory.coin && secondBody.categoryBitMask == PhysicsCategory.playerBall) {
             playerScore += 1
             updateScore()
-            
-            // Удаляем монету из сцены
+
+            playerHitCoin = true // Игрок попал в монету
+
             if secondBody.categoryBitMask == PhysicsCategory.coin {
                 secondBody.node?.removeFromParent()
             } else if firstBody.categoryBitMask == PhysicsCategory.coin {
                 firstBody.node?.removeFromParent()
             }
         }
-        
-        // Столкновение бота с монетой
+
+        // Проверка на контакт шара бота с монетой
         if (firstBody.categoryBitMask == PhysicsCategory.botBall && secondBody.categoryBitMask == PhysicsCategory.coin) ||
-           (firstBody.categoryBitMask == PhysicsCategory.coin && secondBody.categoryBitMask == PhysicsCategory.botBall) {
+            (firstBody.categoryBitMask == PhysicsCategory.coin && secondBody.categoryBitMask == PhysicsCategory.botBall) {
             botScore += 1
             updateBotScore()
-            
-            // Удаляем монету из сцены
+
             if secondBody.categoryBitMask == PhysicsCategory.coin {
                 secondBody.node?.removeFromParent()
             } else if firstBody.categoryBitMask == PhysicsCategory.coin {
@@ -355,26 +400,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
 
+    func showGameOver() {
+        let gameOverLabel = SKLabelNode(text: "Game Over")
+        gameOverLabel.fontSize = 50
+        gameOverLabel.fontColor = .red
+        gameOverLabel.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        gameOverLabel.zPosition = 10 // Поверх остальных элементов
+        addChild(gameOverLabel)
+    }
 
     func updateBotScore() {
         botScoreLabel.text = "Bot Score: \(botScore)"
     }
 
-    // Update Score Display
     func updateScore() {
         playerScoreLabel.text = "Score: \(playerScore)"
     }
-
-    override func update(_ currentTime: TimeInterval) {
-        // Проверяем, если оба шара упали за пределы экрана
-        if ballInPlay && playerBall.position.y < 0 && botBall.position.y < 0 {
-            ballInPlay = false
-            playerBall.removeFromParent()
-            botBall.removeFromParent()
-
-            // Генерация новой монеты только после окончания броска
-            generateNewCoin()
-        }
-    }
-
 }
+
+
+
