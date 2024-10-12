@@ -18,6 +18,7 @@ struct InfoView: View {
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
+            
             VStack {
                 Spacer()
                 

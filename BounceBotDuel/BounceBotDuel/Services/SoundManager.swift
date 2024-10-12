@@ -15,7 +15,7 @@ class SoundManager: ObservableObject {
     var player: AVAudioPlayer?
     @Published var isSoundOn: Bool = true
     
-    private init() {}
+    init() {}
     
     // Play music game
     func playBackgroundMusic() {

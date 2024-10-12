@@ -14,7 +14,7 @@ struct MenuView: View {
    
     // MARK: - Play button -
     var playButton: some View {
-        NavigationLink(destination: EmptyView()) {
+        NavigationLink(destination: GameView()) {
             Image(.playButton)
         }
         .padding(.top, 100)
