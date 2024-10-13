@@ -80,14 +80,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var winBlock: SKSpriteNode?
     var loseBlock: SKSpriteNode?
 
-    var collectedCoins = 0 // Количество монет за текущий раунд
+    var collectedCoins = 0
     var playerLives = 3
     var lifeIndicator: SKSpriteNode!
 
-    var winCallback: ((Int) -> Void)? // Коллбэк для победы
-    var loseCallback: (() -> Void)? // Коллбэк для поражения
+    var winCallback: ((Int) -> Void)?
+    var loseCallback: (() -> Void)?
 
-    let coinKey = "totalCoins" // Ключ для UserDefaults
+    let coinKey = "totalCoins"
     
     var levelHomeButton: SKSpriteNode?
     var levelNextButton: SKSpriteNode?
@@ -97,10 +97,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     struct PhysicsCategory {
         static let none: UInt32 = 0
-        static let playerBall: UInt32 = 0b1
-        static let botBall: UInt32 = 0b10
-        static let coin: UInt32 = 0b100
+        static let playerBall: UInt32 = 0b1  // 1
+        static let botBall: UInt32 = 0b10    // 2
+        static let coin: UInt32 = 0b100      // 4
+        static let pin: UInt32 = 0b1000      // 8
     }
+
 
     let level1RelativePins: [CGPoint] = [
         CGPoint(x: -2, y: 3), CGPoint(x: -1, y: 3), CGPoint(x: 0, y: 3), CGPoint(x: 1, y: 3), CGPoint(x: 2, y: 3),
@@ -133,12 +135,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         setupPlayerNameLabel()
         setupPauseButton()
         setupPlayerLives()
-        setupWinLoseBlocks() // Инициализация блоков
+        setupWinLoseBlocks()
         physicsWorld.gravity = CGVector(dx: 0, dy: -4.8)
         physicsWorld.contactDelegate = self
     }
-    
-
     
     func hideWinLoseBlocks() {
           winBlock?.isHidden = true
@@ -150,18 +150,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         winBlock = SKSpriteNode(imageNamed: "BlockWin")
         winBlock?.position = CGPoint(x: size.width / 2, y: size.height / 2)
         winBlock?.zPosition = 10
-        winBlock?.isHidden = true // Скрываем по умолчанию
+        winBlock?.isHidden = true
         addChild(winBlock!)
 
-        // Кнопки для блока победы
         levelHomeButton = SKSpriteNode(imageNamed: "LevelHome")
-        levelHomeButton?.position = CGPoint(x: -90, y: -100) // Слева
+        levelHomeButton?.position = CGPoint(x: -90, y: -100)
         levelHomeButton?.name = "levelHomeButton"
         levelHomeButton?.zPosition = 11
         winBlock?.addChild(levelHomeButton!)
 
         levelNextButton = SKSpriteNode(imageNamed: "LevelNext")
-        levelNextButton?.position = CGPoint(x: 45, y: -100) // Справа
+        levelNextButton?.position = CGPoint(x: 45, y: -100)
         levelNextButton?.name = "levelNextButton"
         levelNextButton?.zPosition = 11
         winBlock?.addChild(levelNextButton!)
@@ -170,18 +169,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         loseBlock = SKSpriteNode(imageNamed: "BLockLose")
         loseBlock?.position = CGPoint(x: size.width / 2, y: size.height / 2)
         loseBlock?.zPosition = 10
-        loseBlock?.isHidden = true // Скрываем по умолчанию
+        loseBlock?.isHidden = true
         addChild(loseBlock!)
 
-        // Кнопки для блока поражения
         levelHomeButton = SKSpriteNode(imageNamed: "LevelHome")
-        levelHomeButton?.position = CGPoint(x: -45, y: -100) // Слева
+        levelHomeButton?.position = CGPoint(x: -45, y: -100)
         levelHomeButton?.name = "levelHomeButton"
         levelHomeButton?.zPosition = 11
         loseBlock?.addChild(levelHomeButton!)
 
         levelRestartButton = SKSpriteNode(imageNamed: "LevelRestart")
-        levelRestartButton?.position = CGPoint(x: 45, y: -100) // Справа
+        levelRestartButton?.position = CGPoint(x: 45, y: -100)
         levelRestartButton?.name = "levelRestartButton"
         levelRestartButton?.zPosition = 11
         loseBlock?.addChild(levelRestartButton!)
@@ -189,14 +187,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     func showWinBlock(coins: Int) {
         winBlock?.isHidden = false
+        
         let coinLabel = SKLabelNode(fontNamed: "SupercellMagic")
         coinLabel.text = "\(coins)"
         coinLabel.fontSize = 32
         coinLabel.fontColor = .cFFE500
-        coinLabel.position = CGPoint(x: 0, y: -20)
-        winBlock?.addChild(coinLabel)
+
+        let coin = SKSpriteNode(imageNamed: "Coin")
+        coin.setScale(1)
         
-    
+        let totalWidth = coin.size.width + coinLabel.frame.width + 10
+        
+        coin.position = CGPoint(x: -(totalWidth / 2) + coin.size.width / 2, y: -8)
+        winBlock?.addChild(coin)
+        
+        coinLabel.position = CGPoint(x: coin.position.x + coin.size.width / 2 + 10 + coinLabel.frame.width / 2, y: -20)
+        winBlock?.addChild(coinLabel)
     }
 
     func showLoseBlock() {
@@ -218,41 +224,36 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
          addChild(background)
      }
     
-    // Метод для сохранения общего количества монет
     func saveTotalCoins(_ coins: Int) {
         let currentCoins = UserDefaults.standard.integer(forKey: coinKey)
         UserDefaults.standard.set(currentCoins + coins, forKey: coinKey)
     }
 
     func setupPlayerNameLabel() {
-        // Добавляем задний фон для аватара
         let avatarBackground = SKSpriteNode(imageNamed: "Block3")
-        avatarBackground.size = CGSize(width: 60, height: 60) // Фон чуть больше аватара
-        avatarBackground.position = CGPoint(x: size.width * 0.1, y: size.height - 170) // Тот же центр, что и у аватара
+        avatarBackground.size = CGSize(width: 60, height: 60)
+        avatarBackground.position = CGPoint(x: size.width * 0.1, y: size.height - 170)
         addChild(avatarBackground)
         
-        // Добавляем аватар
         let playerAvatarTexture = SKTexture(imageNamed: viewModel.playerAvatar)
         playerAvatar = SKSpriteNode(texture: playerAvatarTexture)
         playerAvatar.size = CGSize(width: 45, height: 45)
         playerAvatar.position = avatarBackground.position
-        playerAvatar.zPosition = 1  // Устанавливаем выше заднего фона
+        playerAvatar.zPosition = 1
 
-        // Добавляем маску для скругления углов
-        let roundedAvatar = SKShapeNode(rectOf: playerAvatar.size, cornerRadius: 10) // Скругленные углы
+        let roundedAvatar = SKShapeNode(rectOf: playerAvatar.size, cornerRadius: 10)
         roundedAvatar.fillTexture = playerAvatarTexture
-        roundedAvatar.fillColor = .white // Белый цвет, если что-то не покрыто текстурой
+        roundedAvatar.fillColor = .white
         roundedAvatar.position = CGPoint(x: playerAvatar.position.x, y: playerAvatar.position.y + 3)
         roundedAvatar.zPosition = 2
-
         addChild(roundedAvatar)
         
-        // Добавляем имя игрока, выравнивая его по верхнему краю аватара
         playerNameLabel = SKLabelNode(fontNamed: "SupercellMagic")
         playerNameLabel.text = viewModel.playerName
         playerNameLabel.fontSize = 20
         playerNameLabel.fontColor = .white
         playerNameLabel.verticalAlignmentMode = .top
+        playerNameLabel.zPosition = 5
         playerNameLabel.position = CGPoint(x: playerAvatar.position.x + 65, y: playerAvatar.position.y + playerAvatar.size.height / 2 + 3)
         addChild(playerNameLabel)
     }
@@ -327,6 +328,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             peg.physicsBody = SKPhysicsBody(circleOfRadius: peg.size.width / 2)
             peg.physicsBody?.isDynamic = false
             peg.physicsBody?.restitution = 0.8
+            peg.physicsBody?.categoryBitMask = PhysicsCategory.pin
+            peg.physicsBody?.contactTestBitMask = PhysicsCategory.playerBall | PhysicsCategory.botBall
             addChild(peg)
             obstacles.append(peg)
         }
@@ -336,7 +339,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let randomIndex = Int.random(in: 0..<obstacles.count)
         let coinPosition = obstacles[randomIndex].position
 
-        // Создаем узел для монеты
         coin = SKSpriteNode(imageNamed: "coin-1")
         coin.position = coinPosition
         coin.setScale(0.15)
@@ -346,7 +348,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         coin.physicsBody?.contactTestBitMask = PhysicsCategory.playerBall | PhysicsCategory.botBall
         addChild(coin)
 
-        // Создаем массив текстур для анимации от 1 до 10
         var coinTextures: [SKTexture] = []
         for i in 1...10 {
             let textureName = "coin-\(i)"
@@ -354,7 +355,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             coinTextures.append(texture)
         }
 
-        // Создаем обратную последовательность от 9 до 1 (для 11-20)
         var reverseCoinTextures: [SKTexture] = []
         for i in (1...9).reversed() {
             let textureName = "coin-\(i)"
@@ -362,27 +362,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             reverseCoinTextures.append(texture)
         }
 
-        // Объединяем все текстуры
         let fullAnimationTextures = coinTextures + reverseCoinTextures
-
-        // Создаем анимацию для первых 10 кадров
         let forwardAnimation = SKAction.animate(with: coinTextures, timePerFrame: 0.1)
 
-        // Анимация с переворотом от 11 до 20
         let flippedAnimation = SKAction.run { [weak self] in
-            self?.coin.xScale = -0.15 // Отражаем текстуры от 11 до 20
+            self?.coin.xScale = -0.15
         }
         let reverseAnimation = SKAction.animate(with: reverseCoinTextures, timePerFrame: 0.1)
 
-        // Возвращаем нормальный масштаб
         let unflippedAnimation = SKAction.run { [weak self] in
-            self?.coin.xScale = 0.15 // Восстанавливаем обычный масштаб
+            self?.coin.xScale = 0.15
         }
 
-        // Создаем последовательность анимаций
         let sequence = SKAction.sequence([forwardAnimation, flippedAnimation, reverseAnimation, unflippedAnimation])
 
-        // Запускаем бесконечную анимацию
         let repeatAnimation = SKAction.repeatForever(sequence)
         coin.run(repeatAnimation)
     }
@@ -404,15 +397,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             lifeIndicator.texture = SKTexture(imageNamed: "Life1")
         }
 
-        // Проверка на поражение, если жизни закончились
         if playerLives <= 0 {
             showGameOver()
         }
     }
 
     func launchBalls() {
-        guard !ballInPlay else { return } // Проверяем, что мячи не запущены
-
+        guard !ballInPlay else { return }
         ballInPlay = true
 
         // Player Ball
@@ -443,7 +434,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let botRandomSpeedX = CGFloat.random(in: -3...3)
 
         // Player logic
-        let shouldPlayerMiss = Int.random(in: 1...10) == 10 // 1 из 10 попыток промах
+        let shouldPlayerMiss = Int.random(in: 1...10) == 10
 
         if shouldPlayerMiss {
             playerBall.physicsBody?.applyImpulse(CGVector(dx: playerRandomSpeedX, dy: -5))
@@ -454,7 +445,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
 
         // Bot logic
-        let shouldBotHit = Int.random(in: 1...3) == 3 // 1 из 3 попыток попадание
+        let shouldBotHit = Int.random(in: 1...3) == 3
 
         if shouldBotHit {
             let dx = (coin.position.x - botBall.position.x) * 0.03 + botRandomSpeedX
@@ -500,47 +491,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         soundButton.removeFromParent()
     }
     
-    func goToHomeScreen() {
-         // Закрытие сцены или возврат на предыдущий экран
-         NotificationCenter.default.post(name: Notification.Name("goHome"), object: nil)
-     }
     
     func resetGame() {
-        // Сбрасываем счета и количество монет
-
         playerScore = 0
         botScore = 0
         collectedCoins = 0
         playerLives = 3
         ballInPlay = false
 
-        // Обновляем текстовые метки счета
         playerScoreLabel.text = "\(playerScore)"
         botScoreLabel.text = "\(botScore)"
-        updatePlayerLives() // Обновляем индикатор жизней
+        updatePlayerLives()
 
-        // Убираем старые объекты (мяч, монету, и т.д.)
         playerBall?.removeFromParent()
         botBall?.removeFromParent()
         coin?.removeFromParent()
 
-        // Сбрасываем блоки победы и поражения
         hideWinLoseBlocks()
-
-        // Пересоздаем монету
-
-        // Пересоздаем другие игровые элементы (например, препятствия)
         setupObstaclesForLevel()
         setupCoinForLevel()
-        // Убедитесь, что новый раунд начнется заново
         ballInPlay = false
-
-        // Можно добавить дополнительную логику для сброса состояния уровня
     }
 
-     // Логика для рестарта уровня
      func restartLevel() {
-         resetGame() // Перезапуск уровня
+         resetGame()
      }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -549,13 +523,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
         if let node = atPoint(location) as? SKSpriteNode {
             if node.name == "levelHomeButton" {
-                dismissCallback?()// Переход на предыдущий экран
+                dismissCallback?()
             } else if node.name == "levelNextButton" {
 
             } else if node.name == "levelRestartButton" {
-                restartLevel() // Логика рестарта уровня
+                restartLevel()
             } else {
-                // Другие действия при касании (например, запуск шаров)
                 if !isSettingsPanelVisible {
                     launchBalls()
                 }
@@ -605,7 +578,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         coin.physicsBody?.contactTestBitMask = PhysicsCategory.playerBall | PhysicsCategory.botBall
         addChild(coin)
 
-        // Создаем массив текстур для анимации от 1 до 10
         var coinTextures: [SKTexture] = []
         for i in 1...10 {
             let textureName = "coin-\(i)"
@@ -613,7 +585,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             coinTextures.append(texture)
         }
 
-        // Создаем обратную последовательность от 9 до 1 (для 11-20)
         var reverseCoinTextures: [SKTexture] = []
         for i in (1...9).reversed() {
             let textureName = "coin-\(i)"
@@ -621,27 +592,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             reverseCoinTextures.append(texture)
         }
 
-        // Объединяем все текстуры
         let fullAnimationTextures = coinTextures + reverseCoinTextures
-
-        // Создаем анимацию для первых 10 кадров
         let forwardAnimation = SKAction.animate(with: coinTextures, timePerFrame: 0.1)
 
-        // Анимация с переворотом от 11 до 20
         let flippedAnimation = SKAction.run { [weak self] in
-            self?.coin.xScale = -0.15 // Отражаем текстуры от 11 до 20
+            self?.coin.xScale = -0.15
         }
         let reverseAnimation = SKAction.animate(with: reverseCoinTextures, timePerFrame: 0.1)
 
-        // Возвращаем нормальный масштаб
         let unflippedAnimation = SKAction.run { [weak self] in
-            self?.coin.xScale = 0.15 // Восстанавливаем обычный масштаб
+            self?.coin.xScale = 0.15
         }
 
-        // Создаем последовательность анимаций
         let sequence = SKAction.sequence([forwardAnimation, flippedAnimation, reverseAnimation, unflippedAnimation])
 
-        // Запускаем бесконечную анимацию
         let repeatAnimation = SKAction.repeatForever(sequence)
         coin.run(repeatAnimation)
     }
@@ -650,7 +614,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let firstBody = contact.bodyA
         let secondBody = contact.bodyB
 
-        // Проверка, попал ли игрок по монете
         if (firstBody.categoryBitMask == PhysicsCategory.playerBall && secondBody.categoryBitMask == PhysicsCategory.coin) ||
             (firstBody.categoryBitMask == PhysicsCategory.coin && secondBody.categoryBitMask == PhysicsCategory.playerBall) {
             playerScore += 1
@@ -658,7 +621,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             updateScore()
             playerHitCoin = true
 
-            // Проверка на победу (если собрано 3 монеты)
+            let coinSoundAction = SKAction.playSoundFileNamed("coinSound.mp3", waitForCompletion: false)
+            run(coinSoundAction)
+
             if collectedCoins >= 1 {
                 showVictory()
             }
@@ -670,11 +635,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
 
-        // Проверка, попал ли бот по монете
+        if (firstBody.categoryBitMask == PhysicsCategory.playerBall && secondBody.categoryBitMask == PhysicsCategory.pin) ||
+            (firstBody.categoryBitMask == PhysicsCategory.pin && secondBody.categoryBitMask == PhysicsCategory.playerBall) {
+            let pinSoundAction = SKAction.playSoundFileNamed("pinSound.mp3", waitForCompletion: false)
+            run(pinSoundAction)
+        }
+
+        if (firstBody.categoryBitMask == PhysicsCategory.botBall && secondBody.categoryBitMask == PhysicsCategory.pin) ||
+            (firstBody.categoryBitMask == PhysicsCategory.pin && secondBody.categoryBitMask == PhysicsCategory.botBall) {
+            let pinSoundAction = SKAction.playSoundFileNamed("pinSound.mp3", waitForCompletion: false)
+            run(pinSoundAction)
+        }
+
         if (firstBody.categoryBitMask == PhysicsCategory.botBall && secondBody.categoryBitMask == PhysicsCategory.coin) ||
             (firstBody.categoryBitMask == PhysicsCategory.coin && secondBody.categoryBitMask == PhysicsCategory.botBall) {
             botScore += 1
             updateBotScore()
+
+            let coinSoundAction = SKAction.playSoundFileNamed("coinSound.mp3", waitForCompletion: false)
+            run(coinSoundAction)
 
             if secondBody.categoryBitMask == PhysicsCategory.coin {
                 secondBody.node?.removeFromParent()
@@ -684,17 +663,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
 
-    // Логика победы
     func showVictory() {
         winCallback?(collectedCoins)
-        saveTotalCoins(collectedCoins) // Сохранение монет только при победе
-        showWinBlock(coins: collectedCoins) // Отображение блока победы
+        saveTotalCoins(collectedCoins)
+        showWinBlock(coins: collectedCoins)
     }
 
-    // Логика поражения
     func showGameOver() {
         loseCallback?()
-        showLoseBlock() // Отображение блока поражения
+        showLoseBlock()
     }
 
     func updateBotScore() {
