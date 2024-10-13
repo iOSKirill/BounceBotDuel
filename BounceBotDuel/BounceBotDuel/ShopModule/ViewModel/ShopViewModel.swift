@@ -13,7 +13,7 @@ class ShopViewModel: ObservableObject {
     // MARK: - Properties -
     @Published var playerName: String = "Player"
     @Published var playerAvatar: String = "Avatar1"
-    @Published var coinCount: Int = 15
+    @Published var coinCount: Int = 0
     @Published var balls: [Ball] = []
     @Published var backgrounds: [Background] = []
     @Published var isSettingsPanelVisible = false
@@ -22,7 +22,7 @@ class ShopViewModel: ObservableObject {
 
     private let nameKey = "playerName"
     private let avatarKey = "selectedAvatar"
-    private let coinKey = "userCoins"
+    private let coinKey = "totalCoins"
     private let purchasedBallsKey = "purchasedBalls"
     private let selectedBallKey = "selectedBall"
     private let purchasedBackgroundsKey = "purchasedBackgrounds"
@@ -36,7 +36,7 @@ class ShopViewModel: ObservableObject {
     // MARK: - Init -
     init() {
         loadUserData()
-        loadCoinCount()
+        loadCoinCount()  // Загружаем счет при инициализации
         loadBallData()
         loadBackgroundData() // Load backgrounds
     }
@@ -50,9 +50,6 @@ class ShopViewModel: ObservableObject {
     // Load coin count from UserDefaults
     func loadCoinCount() {
         coinCount = UserDefaults.standard.integer(forKey: coinKey)
-        if coinCount == 0 {
-            coinCount = 15
-        }
     }
     
     // Save coin count to UserDefaults
@@ -64,6 +61,11 @@ class ShopViewModel: ObservableObject {
     // Save coin count to UserDefaults
     private func saveCoinCount() {
         UserDefaults.standard.set(coinCount, forKey: coinKey)
+    }
+
+    // Функция для обновления данных о монетах при каждом появлении экрана
+    func refreshCoinCount() {
+        loadCoinCount() // Обновляем счет из UserDefaults
     }
     
     // MARK: - Ball Data Management -
@@ -180,3 +182,4 @@ class ShopViewModel: ObservableObject {
         }
     }
 }
+

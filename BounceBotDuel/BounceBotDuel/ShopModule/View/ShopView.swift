@@ -168,6 +168,9 @@ struct ShopView: View {
                 }
             }
         }
+        .onAppear {
+            viewModel.refreshCoinCount()
+        }
         .navigationBarBackButtonHidden(true)
     }
 }

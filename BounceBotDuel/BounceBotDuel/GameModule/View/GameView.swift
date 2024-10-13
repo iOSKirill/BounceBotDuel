@@ -9,99 +9,33 @@ import SpriteKit
 import SwiftUI
 import Combine
 
+
 struct GameView: View {
     // MARK: - Property -
     @EnvironmentObject var soundManager: SoundManager
     @Environment(\.dismiss) var dismiss
-    @State private var showWinBlock = false
-    @State private var showLoseBlock = false
-    @State private var roundCoins = 0 // Количество монет за текущий раунд
-
-    // Референс на сцену, чтобы вызывать методы перезапуска
+    @State private var roundCoins = 0
     @State private var currentScene: GameScene?
 
     var scene: SKScene {
-        let scene = GameScene(soundManager: soundManager, shopViewModel: ShopViewModel(), winCallback: { coins in
-            roundCoins = coins
-            showWinBlock = true
-        }, loseCallback: {
-            showLoseBlock = true
-        })
-        currentScene = scene // Сохраняем ссылку на сцену
-        scene.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-        scene.scaleMode = .resizeFill
-        return scene
-    }
-    
-    // MARK: - Win block -
-    var winBlock: some View {
-        ZStack {
-            Image(.blockWin)
-            
-            HStack {
-                Image(.coin)
-                Text("\(roundCoins)") // Отображаем количество монет за раунд
-                    .font(.appBold(of: 32))
-                    .foregroundColor(.cFFE500)
-            }
-            .padding(.top, 18)
-            
-            HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(.levelHome)
-                }
-                Button {
-                    // Действие при нажатии кнопки "следующий уровень"
-                } label: {
-                    Image(.levelNext)
-                }
-            }
-            .offset(y: 110)
-        }
-    }
-    
-    // MARK: - Lose block -
-    var loseBlock: some View {
-        ZStack {
-            Image(.bLockLose)
-            
-            HStack {
-                Text("0") // Проигрыш, показываем 0 монет
-                    .font(.appBold(of: 32))
-                    .foregroundColor(.cFFE500)
-            }
-            .padding(.top, 18)
-            
-            HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(.levelHome)
-                }
-                Button {
-                    currentScene?.resetGame()
-                    showLoseBlock = false // Убираем loseBlock с экрана
-                } label: {
-                    Image(.levelRestart)
-                }
-            }
-            .offset(y: 110)
-        }
-    }
+         let scene = GameScene(soundManager: soundManager, shopViewModel: ShopViewModel(), winCallback: { coins in
+             roundCoins = coins
+         }, loseCallback: {})
+         
+         scene.dismissCallback = {
+             dismiss()
+         }
+
+         scene.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+         scene.scaleMode = .resizeFill
+         return scene
+     }
 
     // MARK: - Body -
     var body: some View {
         ZStack {
             SpriteView(scene: scene)
                 .ignoresSafeArea()
-
-            if showWinBlock {
-                winBlock
-            } else if showLoseBlock {
-                loseBlock
-            }
         }
         .navigationBarBackButtonHidden(true)
     }
@@ -111,7 +45,6 @@ struct GameView: View {
     GameView()
         .environmentObject(SoundManager())
 }
-
 
 import SpriteKit
 import UIKit
@@ -144,16 +77,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var botScore = 0
     var botScoreLabel: SKLabelNode!
     var botAttemptCount = 0
-    
+    var winBlock: SKSpriteNode?
+    var loseBlock: SKSpriteNode?
+
     var collectedCoins = 0 // Количество монет за текущий раунд
     var playerLives = 3
     var lifeIndicator: SKSpriteNode!
-    
+
     var winCallback: ((Int) -> Void)? // Коллбэк для победы
     var loseCallback: (() -> Void)? // Коллбэк для поражения
 
     let coinKey = "totalCoins" // Ключ для UserDefaults
     
+    var levelHomeButton: SKSpriteNode?
+    var levelNextButton: SKSpriteNode?
+    var levelRestartButton: SKSpriteNode?
+    
+    var dismissCallback: (() -> Void)?
+
     struct PhysicsCategory {
         static let none: UInt32 = 0
         static let playerBall: UInt32 = 0b1
@@ -192,23 +133,80 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         setupPlayerNameLabel()
         setupPauseButton()
         setupPlayerLives()
+        setupWinLoseBlocks() // Инициализация блоков
         physicsWorld.gravity = CGVector(dx: 0, dy: -4.8)
         physicsWorld.contactDelegate = self
     }
     
-    func resetGame() {
-        playerScore = 0
-        botScore = 0
-        collectedCoins = 0
-        playerLives = 3
-        ballInPlay = false
-        playerScoreLabel.text = "\(playerScore)"
-        botScoreLabel.text = "\(botScore)"
-        updatePlayerLives()
-        coin?.removeFromParent()
-        playerBall?.removeFromParent()
-        botBall?.removeFromParent()
-        setupCoinForLevel() // Пересоздаем монету
+
+    
+    func hideWinLoseBlocks() {
+          winBlock?.isHidden = true
+          loseBlock?.isHidden = true
+      }
+    
+    func setupWinLoseBlocks() {
+        // Win Block
+        winBlock = SKSpriteNode(imageNamed: "BlockWin")
+        winBlock?.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        winBlock?.zPosition = 10
+        winBlock?.isHidden = true // Скрываем по умолчанию
+        addChild(winBlock!)
+
+        // Кнопки для блока победы
+        levelHomeButton = SKSpriteNode(imageNamed: "LevelHome")
+        levelHomeButton?.position = CGPoint(x: -90, y: -100) // Слева
+        levelHomeButton?.name = "levelHomeButton"
+        levelHomeButton?.zPosition = 11
+        winBlock?.addChild(levelHomeButton!)
+
+        levelNextButton = SKSpriteNode(imageNamed: "LevelNext")
+        levelNextButton?.position = CGPoint(x: 45, y: -100) // Справа
+        levelNextButton?.name = "levelNextButton"
+        levelNextButton?.zPosition = 11
+        winBlock?.addChild(levelNextButton!)
+
+        // Lose Block
+        loseBlock = SKSpriteNode(imageNamed: "BLockLose")
+        loseBlock?.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        loseBlock?.zPosition = 10
+        loseBlock?.isHidden = true // Скрываем по умолчанию
+        addChild(loseBlock!)
+
+        // Кнопки для блока поражения
+        levelHomeButton = SKSpriteNode(imageNamed: "LevelHome")
+        levelHomeButton?.position = CGPoint(x: -45, y: -100) // Слева
+        levelHomeButton?.name = "levelHomeButton"
+        levelHomeButton?.zPosition = 11
+        loseBlock?.addChild(levelHomeButton!)
+
+        levelRestartButton = SKSpriteNode(imageNamed: "LevelRestart")
+        levelRestartButton?.position = CGPoint(x: 45, y: -100) // Справа
+        levelRestartButton?.name = "levelRestartButton"
+        levelRestartButton?.zPosition = 11
+        loseBlock?.addChild(levelRestartButton!)
+    }
+
+    func showWinBlock(coins: Int) {
+        winBlock?.isHidden = false
+        let coinLabel = SKLabelNode(fontNamed: "SupercellMagic")
+        coinLabel.text = "\(coins)"
+        coinLabel.fontSize = 32
+        coinLabel.fontColor = .cFFE500
+        coinLabel.position = CGPoint(x: 0, y: -20)
+        winBlock?.addChild(coinLabel)
+        
+    
+    }
+
+    func showLoseBlock() {
+        loseBlock?.isHidden = false
+        let loseLabel = SKLabelNode(fontNamed: "SupercellMagic")
+        loseLabel.text = "0"
+        loseLabel.fontSize = 32
+        loseLabel.fontColor = .cFFE500
+        loseLabel.position = CGPoint(x: 0, y: -20)
+        loseBlock?.addChild(loseLabel)
     }
 
     func setupBackground() {
@@ -250,8 +248,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(roundedAvatar)
         
         // Добавляем имя игрока, выравнивая его по верхнему краю аватара
-        playerNameLabel = SKLabelNode(text: viewModel.playerName)
-        playerNameLabel.fontName = "SupercellMagic"
+        playerNameLabel = SKLabelNode(fontNamed: "SupercellMagic")
+        playerNameLabel.text = viewModel.playerName
         playerNameLabel.fontSize = 20
         playerNameLabel.fontColor = .white
         playerNameLabel.verticalAlignmentMode = .top
@@ -273,21 +271,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         scoreCoinImage.zPosition = 2
         addChild(scoreCoinImage)
         
-        playerScoreLabel = SKLabelNode(text: "\(playerScore)")
-        playerScoreLabel.fontName = "SupercellMagic"
+        playerScoreLabel = SKLabelNode(fontNamed: "SupercellMagic")
+        playerScoreLabel.text = "\(playerScore)"
         playerScoreLabel.fontSize = 16
         playerScoreLabel.fontColor = .cFFE500
-        playerScoreLabel.position = CGPoint(x: size.width * 0.148, y: size.height - 110)
+        playerScoreLabel.position = CGPoint(x: size.width * 0.148, y: size.height - 111)
         playerScoreLabel.zPosition = 2
         addChild(playerScoreLabel)
     }
 
     func setupBotScoreLabel() {
-        botScoreLabel = SKLabelNode(text: "\(botScore)")
-        botScoreLabel.fontName = "SupercellMagic"
+        botScoreLabel = SKLabelNode(fontNamed: "SupercellMagic")
+        botScoreLabel.text = "\(botScore)"
         botScoreLabel.fontSize = 16
         botScoreLabel.fontColor = .c00D1FF
-        botScoreLabel.position = CGPoint(x: size.width * 0.325, y: size.height - 110)
+        botScoreLabel.position = CGPoint(x: size.width * 0.325, y: size.height - 111)
         addChild(botScoreLabel)
     }
 
@@ -501,15 +499,67 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         restartButton.removeFromParent()
         soundButton.removeFromParent()
     }
+    
+    func goToHomeScreen() {
+         // Закрытие сцены или возврат на предыдущий экран
+         NotificationCenter.default.post(name: Notification.Name("goHome"), object: nil)
+     }
+    
+    func resetGame() {
+        // Сбрасываем счета и количество монет
+
+        playerScore = 0
+        botScore = 0
+        collectedCoins = 0
+        playerLives = 3
+        ballInPlay = false
+
+        // Обновляем текстовые метки счета
+        playerScoreLabel.text = "\(playerScore)"
+        botScoreLabel.text = "\(botScore)"
+        updatePlayerLives() // Обновляем индикатор жизней
+
+        // Убираем старые объекты (мяч, монету, и т.д.)
+        playerBall?.removeFromParent()
+        botBall?.removeFromParent()
+        coin?.removeFromParent()
+
+        // Сбрасываем блоки победы и поражения
+        hideWinLoseBlocks()
+
+        // Пересоздаем монету
+
+        // Пересоздаем другие игровые элементы (например, препятствия)
+        setupObstaclesForLevel()
+        setupCoinForLevel()
+        // Убедитесь, что новый раунд начнется заново
+        ballInPlay = false
+
+        // Можно добавить дополнительную логику для сброса состояния уровня
+    }
+
+     // Логика для рестарта уровня
+     func restartLevel() {
+         resetGame() // Перезапуск уровня
+     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
 
-        if pauseButton.contains(location) {
-            toggleSettingsPanel()
-        } else if !isSettingsPanelVisible {
-            launchBalls() // Запуск шаров по касанию
+        if let node = atPoint(location) as? SKSpriteNode {
+            if node.name == "levelHomeButton" {
+                dismissCallback?()// Переход на предыдущий экран
+            } else if node.name == "levelNextButton" {
+
+            } else if node.name == "levelRestartButton" {
+                restartLevel() // Логика рестарта уровня
+            } else {
+                // Другие действия при касании (например, запуск шаров)
+                if !isSettingsPanelVisible {
+                    launchBalls()
+                }
+            }
         }
     }
 
@@ -609,7 +659,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             playerHitCoin = true
 
             // Проверка на победу (если собрано 3 монеты)
-            if collectedCoins >= 3 {
+            if collectedCoins >= 1 {
                 showVictory()
             }
 
@@ -635,15 +685,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     // Логика победы
-     func showVictory() {
-         winCallback?(collectedCoins)
-         saveTotalCoins(collectedCoins) // Сохранение монет только при победе
-     }
+    func showVictory() {
+        winCallback?(collectedCoins)
+        saveTotalCoins(collectedCoins) // Сохранение монет только при победе
+        showWinBlock(coins: collectedCoins) // Отображение блока победы
+    }
 
-     // Логика поражения
-     func showGameOver() {
-         loseCallback?()
-     }
+    // Логика поражения
+    func showGameOver() {
+        loseCallback?()
+        showLoseBlock() // Отображение блока поражения
+    }
 
     func updateBotScore() {
         botScoreLabel.text = "\(botScore)"
