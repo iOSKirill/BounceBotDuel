@@ -93,6 +93,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var levelNextButton: SKSpriteNode?
     var levelRestartButton: SKSpriteNode?
     
+    var blurBackground: SKEffectNode?
+    var dimOverlay: SKSpriteNode?
+    
     var dismissCallback: (() -> Void)?
 
     struct PhysicsCategory {
@@ -136,15 +139,37 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         setupPauseButton()
         setupPlayerLives()
         setupWinLoseBlocks()
+        setupBlurAndDim()
+        setupSettingsPanel()
+        setupDimmingLayer()
         physicsWorld.gravity = CGVector(dx: 0, dy: -4.8)
         physicsWorld.contactDelegate = self
     }
     
+
+    func setupBlurAndDim() {
+        blurBackground = SKEffectNode()
+        let blurFilter = CIFilter(name: "CIGaussianBlur", parameters: ["inputRadius": 20])
+        blurBackground?.filter = blurFilter
+        blurBackground?.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        blurBackground?.zPosition = 9
+        blurBackground?.isHidden = true
+        addChild(blurBackground!)
+        
+        dimOverlay = SKSpriteNode(color: UIColor.black.withAlphaComponent(0.75), size: self.size)
+        dimOverlay?.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        dimOverlay?.zPosition = 9
+        dimOverlay?.isHidden = true
+        addChild(dimOverlay!)
+    }
+
     func hideWinLoseBlocks() {
-          winBlock?.isHidden = true
-          loseBlock?.isHidden = true
-      }
-    
+        winBlock?.isHidden = true
+        loseBlock?.isHidden = true
+        
+        blurBackground?.isHidden = true
+        dimOverlay?.isHidden = true
+    }
     func setupWinLoseBlocks() {
         // Win Block
         winBlock = SKSpriteNode(imageNamed: "BlockWin")
@@ -186,13 +211,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     func showWinBlock(coins: Int) {
+        blurBackground?.isHidden = false
+        dimOverlay?.isHidden = false
+        
         winBlock?.isHidden = false
         
         let coinLabel = SKLabelNode(fontNamed: "SupercellMagic")
         coinLabel.text = "\(coins)"
         coinLabel.fontSize = 32
         coinLabel.fontColor = .cFFE500
-
+        
         let coin = SKSpriteNode(imageNamed: "Coin")
         coin.setScale(1)
         
@@ -206,6 +234,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     func showLoseBlock() {
+        blurBackground?.isHidden = false
+        dimOverlay?.isHidden = false
+        
         loseBlock?.isHidden = false
         let loseLabel = SKLabelNode(fontNamed: "SupercellMagic")
         loseLabel.text = "0"
@@ -253,7 +284,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         playerNameLabel.fontSize = 20
         playerNameLabel.fontColor = .white
         playerNameLabel.verticalAlignmentMode = .top
-        playerNameLabel.zPosition = 5
+        playerNameLabel.zPosition = 2
         playerNameLabel.position = CGPoint(x: playerAvatar.position.x + 65, y: playerAvatar.position.y + playerAvatar.size.height / 2 + 3)
         addChild(playerNameLabel)
     }
@@ -290,10 +321,70 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(botScoreLabel)
     }
 
+ 
+
     func setupPauseButton() {
         pauseButton = SKSpriteNode(imageNamed: "PauseButton")
         pauseButton.position = CGPoint(x: size.width - 50, y: size.height - 100)
+        pauseButton.name = "pauseButton"
+        pauseButton.zPosition = 4
         addChild(pauseButton)
+    }
+    
+    var dimLayer: SKSpriteNode?
+
+    func setupDimmingLayer() {
+        // Create the dimming layer with semi-transparent black color
+        dimLayer = SKSpriteNode(color: UIColor.black.withAlphaComponent(0.75), size: size)
+        dimLayer?.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        dimLayer?.zPosition = 2 // Ensure it's behind the settings panel
+        dimLayer?.isHidden = true // Start hidden
+        addChild(dimLayer!)
+    }
+    
+    func toggleSound() {
+        soundManager.toggleSound()
+        let newSoundButtonImage = soundManager.isSoundOn ? "SoundOnButton" : "SoundOffButton"
+        soundButton.texture = SKTexture(imageNamed: newSoundButtonImage)
+    }
+
+    func setupSettingsPanel() {
+        // Create a background panel image (you can replace "BlockPause" with your actual image)
+        settingsPanel = SKSpriteNode(imageNamed: "BlockPause")
+        settingsPanel.size = CGSize(width: 190, height: 52) // Adjust size based on image
+        settingsPanel.position = CGPoint(x: pauseButton.position.x - 80, y: pauseButton.position.y + 3) // Adjust position based on pause button
+        settingsPanel.zPosition = 3 // Make sure it's behind the pause button
+        settingsPanel.isHidden = true // Start hidden
+        addChild(settingsPanel)
+
+        // Create and add buttons
+        let homeButton = SKSpriteNode(imageNamed: "HomeButton")
+        homeButton.position = CGPoint(x: -68, y: 0)
+        homeButton.name = "homeButton"
+        settingsPanel.addChild(homeButton)
+
+        let restartButton = SKSpriteNode(imageNamed: "RestartButton")
+        restartButton.position = CGPoint(x: -19, y: 0)
+        restartButton.name = "restartButton"
+        settingsPanel.addChild(restartButton)
+
+        let soundButton = SKSpriteNode(imageNamed: soundManager.isSoundOn ? "SoundOnButton" : "SoundOffButton")
+        soundButton.position = CGPoint(x: 30, y: 0)
+        soundButton.name = "soundButton"
+        settingsPanel.addChild(soundButton)
+    }
+
+    func toggleSettingsPanel() {
+        if isSettingsPanelVisible {
+            // Hide the dim layer and settings panel
+            dimLayer?.isHidden = true
+            settingsPanel.isHidden = true
+        } else {
+            // Show the dim layer and settings panel
+            dimLayer?.isHidden = false
+            settingsPanel.isHidden = false
+        }
+        isSettingsPanelVisible.toggle()
     }
 
     func setupCapsule() {
@@ -456,15 +547,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
 
-    func toggleSettingsPanel() {
-        isSettingsPanelVisible.toggle()
-        if isSettingsPanelVisible {
-            showSettingsPanel()
-        } else {
-            hideSettingsPanel()
-        }
-    }
-
     func showSettingsPanel() {
         settingsPanel = SKSpriteNode(color: .black, size: CGSize(width: size.width * 0.8, height: size.height * 0.3))
         settingsPanel.alpha = 0.5
@@ -522,7 +604,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let location = touch.location(in: self)
 
         if let node = atPoint(location) as? SKSpriteNode {
-            if node.name == "levelHomeButton" {
+            if node == pauseButton {
+                toggleSettingsPanel()
+            } else if node.name == "homeButton" {
+                dismissCallback?()
+            } else if node.name == "restartButton" {
+                resetGame()
+                settingsPanel.isHidden = true
+                dimLayer?.isHidden = true
+                isSettingsPanelVisible.toggle()
+            } else if node.name == "soundButton" {
+                soundManager.toggleSound()
+                let soundButton = node as! SKSpriteNode
+                soundButton.texture = SKTexture(imageNamed: soundManager.isSoundOn ? "SoundOnButton" : "SoundOffButton")
+            } else if  node.name == "levelHomeButton" {
                 dismissCallback?()
             } else if node.name == "levelNextButton" {
 
@@ -532,7 +627,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 if !isSettingsPanelVisible {
                     launchBalls()
                 }
-            }
+            } 
         }
     }
 
