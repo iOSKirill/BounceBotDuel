@@ -11,7 +11,7 @@ struct GameView: View {
     @EnvironmentObject var soundManager: SoundManager
 
     var scene: SKScene {
-        let scene = GameScene(soundManager: soundManager)
+        let scene = GameScene(soundManager: soundManager, shopViewModel: ShopViewModel())
         scene.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
         scene.scaleMode = .resizeFill
         return scene
@@ -38,6 +38,7 @@ import UIKit
 class GameScene: SKScene, SKPhysicsContactDelegate {
     
     @StateObject private var viewModel = GameViewModel()
+    @ObservedObject private var shopViewModel: ShopViewModel
 
     var soundManager: SoundManager
     var capsule: SKSpriteNode!
@@ -81,8 +82,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         CGPoint(x: -2, y: 1), CGPoint(x: -1, y: 1), CGPoint(x: 0, y: 1), CGPoint(x: 1, y: 1), CGPoint(x: 2, y: 1)
     ]
 
-    init(soundManager: SoundManager) {
+    init(soundManager: SoundManager, shopViewModel: ShopViewModel) {
         self.soundManager = soundManager
+        self.shopViewModel = shopViewModel
         super.init(size: CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
     }
 
@@ -106,12 +108,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     func setupBackground() {
-        background = SKSpriteNode(imageNamed: "Background1")
-        background.size = self.size
-        background.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-        background.zPosition = -1
-        addChild(background)
-    }
+         let selectedBackgroundImage = shopViewModel.selectedBackgroundImageName
+         background = SKSpriteNode(imageNamed: selectedBackgroundImage)
+         background.size = self.size
+         background.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+         background.zPosition = -1
+         addChild(background)
+     }
 
     func setupPlayerNameLabel() {
         // Добавляем задний фон для аватара
@@ -300,7 +303,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ballInPlay = true
 
         // Player Ball
-        playerBall = SKSpriteNode(imageNamed: "Ball1")
+        let selectedBallImage = shopViewModel.balls.first(where: { $0.isSelected })?.imageName ?? "Ball1"
+        playerBall = SKSpriteNode(imageNamed: selectedBallImage)
         playerBall.size = CGSize(width: 28, height: 28)
         playerBall.position = capsule.position
         playerBall.physicsBody = SKPhysicsBody(circleOfRadius: playerBall.size.width / 2)
