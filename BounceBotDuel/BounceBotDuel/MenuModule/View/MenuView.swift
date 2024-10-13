@@ -12,6 +12,7 @@ struct MenuView: View {
     @StateObject private var viewModel = MenuViewModel()
     @EnvironmentObject var soundManager: SoundManager
     @EnvironmentObject var background: ShopViewModel
+    
    
     // MARK: - Play button -
     var playButton: some View {

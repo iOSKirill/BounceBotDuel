@@ -5,22 +5,103 @@
 //  Created by Kirill Manuilenko on 11.10.24.
 //
 
+import SpriteKit
 import SwiftUI
+import Combine
 
 struct GameView: View {
+    // MARK: - Property -
     @EnvironmentObject var soundManager: SoundManager
+    @Environment(\.dismiss) var dismiss
+    @State private var showWinBlock = false
+    @State private var showLoseBlock = false
+    @State private var roundCoins = 0 // Количество монет за текущий раунд
+
+    // Референс на сцену, чтобы вызывать методы перезапуска
+    @State private var currentScene: GameScene?
 
     var scene: SKScene {
-        let scene = GameScene(soundManager: soundManager, shopViewModel: ShopViewModel())
+        let scene = GameScene(soundManager: soundManager, shopViewModel: ShopViewModel(), winCallback: { coins in
+            roundCoins = coins
+            showWinBlock = true
+        }, loseCallback: {
+            showLoseBlock = true
+        })
+        currentScene = scene // Сохраняем ссылку на сцену
         scene.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
         scene.scaleMode = .resizeFill
         return scene
     }
+    
+    // MARK: - Win block -
+    var winBlock: some View {
+        ZStack {
+            Image(.blockWin)
+            
+            HStack {
+                Image(.coin)
+                Text("\(roundCoins)") // Отображаем количество монет за раунд
+                    .font(.appBold(of: 32))
+                    .foregroundColor(.cFFE500)
+            }
+            .padding(.top, 18)
+            
+            HStack {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(.levelHome)
+                }
+                Button {
+                    // Действие при нажатии кнопки "следующий уровень"
+                } label: {
+                    Image(.levelNext)
+                }
+            }
+            .offset(y: 110)
+        }
+    }
+    
+    // MARK: - Lose block -
+    var loseBlock: some View {
+        ZStack {
+            Image(.bLockLose)
+            
+            HStack {
+                Text("0") // Проигрыш, показываем 0 монет
+                    .font(.appBold(of: 32))
+                    .foregroundColor(.cFFE500)
+            }
+            .padding(.top, 18)
+            
+            HStack {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(.levelHome)
+                }
+                Button {
+                    currentScene?.resetGame()
+                    showLoseBlock = false // Убираем loseBlock с экрана
+                } label: {
+                    Image(.levelRestart)
+                }
+            }
+            .offset(y: 110)
+        }
+    }
 
+    // MARK: - Body -
     var body: some View {
         ZStack {
             SpriteView(scene: scene)
                 .ignoresSafeArea()
+
+            if showWinBlock {
+                winBlock
+            } else if showLoseBlock {
+                loseBlock
+            }
         }
         .navigationBarBackButtonHidden(true)
     }
@@ -64,8 +145,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var botScoreLabel: SKLabelNode!
     var botAttemptCount = 0
     
+    var collectedCoins = 0 // Количество монет за текущий раунд
     var playerLives = 3
     var lifeIndicator: SKSpriteNode!
+    
+    var winCallback: ((Int) -> Void)? // Коллбэк для победы
+    var loseCallback: (() -> Void)? // Коллбэк для поражения
+
+    let coinKey = "totalCoins" // Ключ для UserDefaults
     
     struct PhysicsCategory {
         static let none: UInt32 = 0
@@ -82,9 +169,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         CGPoint(x: -2, y: 1), CGPoint(x: -1, y: 1), CGPoint(x: 0, y: 1), CGPoint(x: 1, y: 1), CGPoint(x: 2, y: 1)
     ]
 
-    init(soundManager: SoundManager, shopViewModel: ShopViewModel) {
+    init(soundManager: SoundManager, shopViewModel: ShopViewModel, winCallback: @escaping (Int) -> Void, loseCallback: @escaping () -> Void) {
         self.soundManager = soundManager
         self.shopViewModel = shopViewModel
+        self.winCallback = winCallback
+        self.loseCallback = loseCallback
         super.init(size: CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
     }
 
@@ -106,6 +195,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         physicsWorld.gravity = CGVector(dx: 0, dy: -4.8)
         physicsWorld.contactDelegate = self
     }
+    
+    func resetGame() {
+        playerScore = 0
+        botScore = 0
+        collectedCoins = 0
+        playerLives = 3
+        ballInPlay = false
+        playerScoreLabel.text = "\(playerScore)"
+        botScoreLabel.text = "\(botScore)"
+        updatePlayerLives()
+        coin?.removeFromParent()
+        playerBall?.removeFromParent()
+        botBall?.removeFromParent()
+        setupCoinForLevel() // Пересоздаем монету
+    }
 
     func setupBackground() {
          let selectedBackgroundImage = shopViewModel.selectedBackgroundImageName
@@ -115,6 +219,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
          background.zPosition = -1
          addChild(background)
      }
+    
+    // Метод для сохранения общего количества монет
+    func saveTotalCoins(_ coins: Int) {
+        let currentCoins = UserDefaults.standard.integer(forKey: coinKey)
+        UserDefaults.standard.set(currentCoins + coins, forKey: coinKey)
+    }
 
     func setupPlayerNameLabel() {
         // Добавляем задний фон для аватара
@@ -295,6 +405,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         } else if playerLives == 1 {
             lifeIndicator.texture = SKTexture(imageNamed: "Life1")
         }
+
+        // Проверка на поражение, если жизни закончились
+        if playerLives <= 0 {
+            showGameOver()
+        }
     }
 
     func launchBalls() {
@@ -330,13 +445,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let botRandomSpeedX = CGFloat.random(in: -3...3)
 
         // Player logic
-        let shouldPlayerMiss = Int.random(in: 1...5) == 5 // 1 из 5 попыток промах
+        let shouldPlayerMiss = Int.random(in: 1...10) == 10 // 1 из 10 попыток промах
 
         if shouldPlayerMiss {
             playerBall.physicsBody?.applyImpulse(CGVector(dx: playerRandomSpeedX, dy: -5))
         } else {
             let dx = (coin.position.x - playerBall.position.x) * 0.03 + playerRandomSpeedX
-            let dy = (coin.position.y - playerBall.position.y) * 0.02
+            let dy = (coin.position.y - playerBall.position.y) * 0.03
             playerBall.physicsBody?.applyImpulse(CGVector(dx: dx, dy: dy))
         }
 
@@ -485,12 +600,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let firstBody = contact.bodyA
         let secondBody = contact.bodyB
 
-        // Check if player ball hits the coin
+        // Проверка, попал ли игрок по монете
         if (firstBody.categoryBitMask == PhysicsCategory.playerBall && secondBody.categoryBitMask == PhysicsCategory.coin) ||
             (firstBody.categoryBitMask == PhysicsCategory.coin && secondBody.categoryBitMask == PhysicsCategory.playerBall) {
             playerScore += 1
+            collectedCoins += 1
             updateScore()
             playerHitCoin = true
+
+            // Проверка на победу (если собрано 3 монеты)
+            if collectedCoins >= 3 {
+                showVictory()
+            }
 
             if secondBody.categoryBitMask == PhysicsCategory.coin {
                 secondBody.node?.removeFromParent()
@@ -499,7 +620,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
 
-        // Check if bot ball hits the coin
+        // Проверка, попал ли бот по монете
         if (firstBody.categoryBitMask == PhysicsCategory.botBall && secondBody.categoryBitMask == PhysicsCategory.coin) ||
             (firstBody.categoryBitMask == PhysicsCategory.coin && secondBody.categoryBitMask == PhysicsCategory.botBall) {
             botScore += 1
@@ -513,14 +634,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
 
-    func showGameOver() {
-        let gameOverLabel = SKLabelNode(text: "Game Over")
-        gameOverLabel.fontSize = 50
-        gameOverLabel.fontColor = .red
-        gameOverLabel.position = CGPoint(x: size.width / 2, y: size.height / 2)
-        gameOverLabel.zPosition = 10
-        addChild(gameOverLabel)
-    }
+    // Логика победы
+     func showVictory() {
+         winCallback?(collectedCoins)
+         saveTotalCoins(collectedCoins) // Сохранение монет только при победе
+     }
+
+     // Логика поражения
+     func showGameOver() {
+         loseCallback?()
+     }
 
     func updateBotScore() {
         botScoreLabel.text = "\(botScore)"
