@@ -11,6 +11,7 @@ struct MenuView: View {
     // MARK: - Property -
     @StateObject private var viewModel = MenuViewModel()
     @EnvironmentObject var soundManager: SoundManager
+    @EnvironmentObject var background: ShopViewModel
    
     // MARK: - Play button -
     var playButton: some View {
@@ -33,7 +34,7 @@ struct MenuView: View {
             }
             .offset(y: -10)
             
-            NavigationLink(destination: EmptyView()) {
+            NavigationLink(destination: ShopView()) {
                 Image(.shopButton)
             }
             .offset(x: -25)
@@ -109,7 +110,7 @@ struct MenuView: View {
         NavigationView {
             
             ZStack {
-                Image(.background1)
+                Image(background.selectedBackgroundImageName)
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()
@@ -137,4 +138,5 @@ struct MenuView: View {
 
 #Preview {
     MenuView()
+        .environmentObject(SoundManager())
 }

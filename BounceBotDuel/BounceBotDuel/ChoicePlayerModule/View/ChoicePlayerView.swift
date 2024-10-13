@@ -10,6 +10,7 @@ import SwiftUI
 struct ChoicePlayerView: View {
     // MARK: - Property -
     @StateObject private var viewModel = ChoicePlayerViewModel()
+    @EnvironmentObject var background: ShopViewModel
     let avatars = ["Avatar1", "Avatar2", "Avatar3"]
     
     // MARK: - Block choose name and avatar player -
@@ -83,7 +84,7 @@ struct ChoicePlayerView: View {
     // MARK: - Body -
     var body: some View {
         ZStack {
-            Image(.background1)
+            Image(background.selectedBackgroundImageName)
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()

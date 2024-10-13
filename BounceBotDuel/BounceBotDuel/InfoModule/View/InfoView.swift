@@ -10,11 +10,12 @@ import SwiftUI
 struct InfoView: View {
     // MARK: - Property -
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var background: ShopViewModel
     
     // MARK: - Body -
     var body: some View {
         ZStack {
-            Image(.background1)
+            Image(background.selectedBackgroundImageName)
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
