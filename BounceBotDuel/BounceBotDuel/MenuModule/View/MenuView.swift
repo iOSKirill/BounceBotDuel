@@ -139,4 +139,5 @@ struct MenuView: View {
 #Preview {
     MenuView()
         .environmentObject(SoundManager())
+        .environmentObject(ShopViewModel())
 }

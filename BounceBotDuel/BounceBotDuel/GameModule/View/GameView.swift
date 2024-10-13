@@ -36,6 +36,8 @@ import SpriteKit
 import UIKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
+    
+    @StateObject private var viewModel = GameViewModel()
 
     var soundManager: SoundManager
     var capsule: SKSpriteNode!
@@ -53,6 +55,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var restartButton: SKSpriteNode!
     var homeButton: SKSpriteNode!
     var background: SKSpriteNode!
+    var playerAvatar: SKSpriteNode!
+    var scoreBoard: SKSpriteNode!
     var isSettingsPanelVisible = false
     var level = 1
     var botScore = 0
@@ -92,6 +96,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         setupObstaclesForLevel()
         setupCoinForLevel()
         setupScoreLabel()
+        setupScoreBoard()
         setupBotScoreLabel()
         setupPlayerNameLabel()
         setupPauseButton()
@@ -109,32 +114,73 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     func setupPlayerNameLabel() {
-        playerNameLabel = SKLabelNode(text: "Player")
+        // Добавляем задний фон для аватара
+        let avatarBackground = SKSpriteNode(imageNamed: "Block3")
+        avatarBackground.size = CGSize(width: 60, height: 60) // Фон чуть больше аватара
+        avatarBackground.position = CGPoint(x: size.width * 0.1, y: size.height - 170) // Тот же центр, что и у аватара
+        addChild(avatarBackground)
+        
+        // Добавляем аватар
+        let playerAvatarTexture = SKTexture(imageNamed: viewModel.playerAvatar)
+        playerAvatar = SKSpriteNode(texture: playerAvatarTexture)
+        playerAvatar.size = CGSize(width: 45, height: 45)
+        playerAvatar.position = avatarBackground.position
+        playerAvatar.zPosition = 1  // Устанавливаем выше заднего фона
+
+        // Добавляем маску для скругления углов
+        let roundedAvatar = SKShapeNode(rectOf: playerAvatar.size, cornerRadius: 10) // Скругленные углы
+        roundedAvatar.fillTexture = playerAvatarTexture
+        roundedAvatar.fillColor = .white // Белый цвет, если что-то не покрыто текстурой
+        roundedAvatar.position = CGPoint(x: playerAvatar.position.x, y: playerAvatar.position.y + 3)
+        roundedAvatar.zPosition = 2
+
+        addChild(roundedAvatar)
+        
+        // Добавляем имя игрока, выравнивая его по верхнему краю аватара
+        playerNameLabel = SKLabelNode(text: viewModel.playerName)
+        playerNameLabel.fontName = "SupercellMagic"
         playerNameLabel.fontSize = 20
         playerNameLabel.fontColor = .white
-        playerNameLabel.position = CGPoint(x: size.width * 0.2, y: size.height - 50)
+        playerNameLabel.verticalAlignmentMode = .top
+        playerNameLabel.position = CGPoint(x: playerAvatar.position.x + 65, y: playerAvatar.position.y + playerAvatar.size.height / 2 + 3)
         addChild(playerNameLabel)
     }
-
+    
+    func setupScoreBoard() {
+        scoreBoard = SKSpriteNode(imageNamed: "Block6")
+        scoreBoard.position = CGPoint(x: size.width * 0.23, y: size.height - 100)
+        scoreBoard.setScale(1.1)
+        addChild(scoreBoard)
+    }
+    
     func setupScoreLabel() {
-        playerScoreLabel = SKLabelNode(text: "Score: \(playerScore)")
-        playerScoreLabel.fontSize = 24
-        playerScoreLabel.fontColor = .white
-        playerScoreLabel.position = CGPoint(x: size.width / 2, y: size.height - 100)
+        let scoreCoinImage = SKSpriteNode(imageNamed: "Coin")
+        scoreCoinImage.position = CGPoint(x: size.width * 0.1, y: size.height - 105)
+        scoreCoinImage.setScale(0.6)
+        scoreCoinImage.zPosition = 2
+        addChild(scoreCoinImage)
+        
+        playerScoreLabel = SKLabelNode(text: "\(playerScore)")
+        playerScoreLabel.fontName = "SupercellMagic"
+        playerScoreLabel.fontSize = 16
+        playerScoreLabel.fontColor = .cFFE500
+        playerScoreLabel.position = CGPoint(x: size.width * 0.148, y: size.height - 110)
+        playerScoreLabel.zPosition = 2
         addChild(playerScoreLabel)
     }
 
     func setupBotScoreLabel() {
-        botScoreLabel = SKLabelNode(text: "Bot Score: \(botScore)")
-        botScoreLabel.fontSize = 24
-        botScoreLabel.fontColor = .white
-        botScoreLabel.position = CGPoint(x: size.width / 2, y: size.height - 140)
+        botScoreLabel = SKLabelNode(text: "\(botScore)")
+        botScoreLabel.fontName = "SupercellMagic"
+        botScoreLabel.fontSize = 16
+        botScoreLabel.fontColor = .c00D1FF
+        botScoreLabel.position = CGPoint(x: size.width * 0.325, y: size.height - 110)
         addChild(botScoreLabel)
     }
 
     func setupPauseButton() {
         pauseButton = SKSpriteNode(imageNamed: "PauseButton")
-        pauseButton.position = CGPoint(x: size.width - 50, y: size.height - 50)
+        pauseButton.position = CGPoint(x: size.width - 50, y: size.height - 100)
         addChild(pauseButton)
     }
 
@@ -179,22 +225,65 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let randomIndex = Int.random(in: 0..<obstacles.count)
         let coinPosition = obstacles[randomIndex].position
 
-        coin = SKSpriteNode(imageNamed: "Coin")
+        // Создаем узел для монеты
+        coin = SKSpriteNode(imageNamed: "coin-1")
         coin.position = coinPosition
+        coin.setScale(0.15)
         coin.physicsBody = SKPhysicsBody(circleOfRadius: coin.size.width / 2)
         coin.physicsBody?.isDynamic = false
         coin.physicsBody?.categoryBitMask = PhysicsCategory.coin
         coin.physicsBody?.contactTestBitMask = PhysicsCategory.playerBall | PhysicsCategory.botBall
         addChild(coin)
+
+        // Создаем массив текстур для анимации от 1 до 10
+        var coinTextures: [SKTexture] = []
+        for i in 1...10 {
+            let textureName = "coin-\(i)"
+            let texture = SKTexture(imageNamed: textureName)
+            coinTextures.append(texture)
+        }
+
+        // Создаем обратную последовательность от 9 до 1 (для 11-20)
+        var reverseCoinTextures: [SKTexture] = []
+        for i in (1...9).reversed() {
+            let textureName = "coin-\(i)"
+            let texture = SKTexture(imageNamed: textureName)
+            reverseCoinTextures.append(texture)
+        }
+
+        // Объединяем все текстуры
+        let fullAnimationTextures = coinTextures + reverseCoinTextures
+
+        // Создаем анимацию для первых 10 кадров
+        let forwardAnimation = SKAction.animate(with: coinTextures, timePerFrame: 0.1)
+
+        // Анимация с переворотом от 11 до 20
+        let flippedAnimation = SKAction.run { [weak self] in
+            self?.coin.xScale = -0.15 // Отражаем текстуры от 11 до 20
+        }
+        let reverseAnimation = SKAction.animate(with: reverseCoinTextures, timePerFrame: 0.1)
+
+        // Возвращаем нормальный масштаб
+        let unflippedAnimation = SKAction.run { [weak self] in
+            self?.coin.xScale = 0.15 // Восстанавливаем обычный масштаб
+        }
+
+        // Создаем последовательность анимаций
+        let sequence = SKAction.sequence([forwardAnimation, flippedAnimation, reverseAnimation, unflippedAnimation])
+
+        // Запускаем бесконечную анимацию
+        let repeatAnimation = SKAction.repeatForever(sequence)
+        coin.run(repeatAnimation)
     }
+
 
     func setupPlayerLives() {
         lifeIndicator = SKSpriteNode(imageNamed: "Life3")
-        lifeIndicator.size = CGSize(width: 70, height: 20)
-        lifeIndicator.position = CGPoint(x: size.width * 0.1, y: size.height - 80)
+        lifeIndicator.size = CGSize(width: 90, height: 10)
+        lifeIndicator.position = CGPoint(x: playerNameLabel.position.x + 17, y: size.height - 185)
         addChild(lifeIndicator)
     }
-
+    
     func updatePlayerLives() {
         if playerLives == 3 {
             lifeIndicator.texture = SKTexture(imageNamed: "Life3")
@@ -211,7 +300,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ballInPlay = true
 
         // Player Ball
-        playerBall = SKSpriteNode(imageNamed: "PlayerBall")
+        playerBall = SKSpriteNode(imageNamed: "Ball1")
+        playerBall.size = CGSize(width: 28, height: 28)
         playerBall.position = capsule.position
         playerBall.physicsBody = SKPhysicsBody(circleOfRadius: playerBall.size.width / 2)
         playerBall.physicsBody?.restitution = 0.5
@@ -222,6 +312,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
         // Bot Ball
         botBall = SKSpriteNode(imageNamed: "BotBall")
+        botBall.size = CGSize(width: 28, height: 28)
         botBall.position = capsule.position
         botBall.physicsBody = SKPhysicsBody(circleOfRadius: botBall.size.width / 2)
         botBall.physicsBody?.restitution = 0.5
@@ -336,13 +427,54 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let randomIndex = Int.random(in: 0..<obstacles.count)
         let coinPosition = obstacles[randomIndex].position
 
-        coin = SKSpriteNode(imageNamed: "Coin")
+        coin = SKSpriteNode(imageNamed: "coin-1")
         coin.position = coinPosition
+        coin.setScale(0.15)
         coin.physicsBody = SKPhysicsBody(circleOfRadius: coin.size.width / 2)
         coin.physicsBody?.isDynamic = false
         coin.physicsBody?.categoryBitMask = PhysicsCategory.coin
         coin.physicsBody?.contactTestBitMask = PhysicsCategory.playerBall | PhysicsCategory.botBall
         addChild(coin)
+
+        // Создаем массив текстур для анимации от 1 до 10
+        var coinTextures: [SKTexture] = []
+        for i in 1...10 {
+            let textureName = "coin-\(i)"
+            let texture = SKTexture(imageNamed: textureName)
+            coinTextures.append(texture)
+        }
+
+        // Создаем обратную последовательность от 9 до 1 (для 11-20)
+        var reverseCoinTextures: [SKTexture] = []
+        for i in (1...9).reversed() {
+            let textureName = "coin-\(i)"
+            let texture = SKTexture(imageNamed: textureName)
+            reverseCoinTextures.append(texture)
+        }
+
+        // Объединяем все текстуры
+        let fullAnimationTextures = coinTextures + reverseCoinTextures
+
+        // Создаем анимацию для первых 10 кадров
+        let forwardAnimation = SKAction.animate(with: coinTextures, timePerFrame: 0.1)
+
+        // Анимация с переворотом от 11 до 20
+        let flippedAnimation = SKAction.run { [weak self] in
+            self?.coin.xScale = -0.15 // Отражаем текстуры от 11 до 20
+        }
+        let reverseAnimation = SKAction.animate(with: reverseCoinTextures, timePerFrame: 0.1)
+
+        // Возвращаем нормальный масштаб
+        let unflippedAnimation = SKAction.run { [weak self] in
+            self?.coin.xScale = 0.15 // Восстанавливаем обычный масштаб
+        }
+
+        // Создаем последовательность анимаций
+        let sequence = SKAction.sequence([forwardAnimation, flippedAnimation, reverseAnimation, unflippedAnimation])
+
+        // Запускаем бесконечную анимацию
+        let repeatAnimation = SKAction.repeatForever(sequence)
+        coin.run(repeatAnimation)
     }
 
     func didBegin(_ contact: SKPhysicsContact) {
@@ -387,11 +519,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     func updateBotScore() {
-        botScoreLabel.text = "Bot Score: \(botScore)"
+        botScoreLabel.text = "\(botScore)"
     }
 
     func updateScore() {
-        playerScoreLabel.text = "Score: \(playerScore)"
+        playerScoreLabel.text = "\(playerScore)"
     }
 }
-

@@ -44,4 +44,8 @@ public extension Color {
     var cFFE500: Color {
         Color("cFFE500")
     }
+    /// #00D1FF
+    var c00D1FF: Color {
+        Color("c00D1FF")
+    }
 }
