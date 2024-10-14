@@ -66,6 +66,13 @@ class LevelsScene: SKScene {
             if let node = atPoint(touchLocation) as? SKSpriteNode {
                 if node.name == "BackButton" {
                     dismissCallback?()
+                } else if let levelName = node.name, levelName.starts(with: "level") {
+                    // Извлекаем номер уровня из имени узла (например, "level1" -> 1)
+                    if let levelNumberString = levelName.components(separatedBy: "level").last,
+                       let levelNumber = Int(levelNumberString) {
+                        let reversedLevelNumber = 11 - levelNumber // Переворачиваем последовательность
+                        print("Level \(reversedLevelNumber) pressed")
+                    }
                 }
             }
         }
