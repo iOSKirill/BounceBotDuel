@@ -82,7 +82,7 @@ class ShopViewModel: ObservableObject {
     
     // Load coin count from UserDefaults
     func loadCoinCount() {
-        coinCount = UserDefaults.standard.integer(forKey: coinKey)
+        coinCount = UserDefaults.standard.integer(forKey: coinKey) 
     }
     
     // Save coin count to UserDefaults
