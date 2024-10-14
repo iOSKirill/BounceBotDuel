@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import UIKit
+import SwiftUI
 
 class ShopViewModel: ObservableObject {
     // MARK: - Properties -
@@ -33,12 +34,44 @@ class ShopViewModel: ObservableObject {
         return screenHeight <= 667 ? 100 : 60
     }
     
+    @Published var achievements: [Achievement] = [
+        Achievement(id: "first_coin", name: "Собери свою первую монету", image: Image("Achievement1"), isCompleted: false),
+        Achievement(id: "first_win", name: "Выиграйте свой первый поединок с ботом", image: Image("Achievement4"), isCompleted: false),
+        Achievement(id: "collect_5_coins", name: "Соберите 5 монет за одну игру", image: Image("Achievement3"), isCompleted: false),
+        Achievement(id: "win_10", name: "Победите бота 10 раз", image: Image("Achievement2"), isCompleted: false),
+        Achievement(id: "win_50", name: "Победите бота 50 раз", image: Image("Achievement5"), isCompleted: false),
+        Achievement(id: "first_coin12", name: "Собери свою первую монету", image: Image("Achievement6"), isCompleted: false),
+        Achievement(id: "first_win2", name: "Выиграйте свой первый поединок с ботом", image: Image("Achievement7"), isCompleted: false),
+        Achievement(id: "collect_5_coins2", name: "Соберите 5 монет за одну игру", image: Image("Achievement8"), isCompleted: false),
+        Achievement(id: "win_102", name: "Победите бота 10 раз", image: Image("Achievement9"), isCompleted: false),
+        Achievement(id: "win_502", name: "Победите бота 50 раз", image: Image("Achievement10"), isCompleted: false)
+    ]
+    
     // MARK: - Init -
     init() {
         loadUserData()
         loadCoinCount()  // Загружаем счет при инициализации
         loadBallData()
         loadBackgroundData() // Load backgrounds
+    }
+    
+    
+    func refreshAchievements() {
+        let completedIDs = UserDefaults.standard.completedAchievements
+        achievements = achievements.map { achievement in
+            var updatedAchievement = achievement
+            updatedAchievement.isCompleted = completedIDs.contains(achievement.id)
+            return updatedAchievement
+        }
+    }
+    
+    func completeAchievement(_ achievement: Achievement) {
+        var completed = UserDefaults.standard.completedAchievements
+        if !completed.contains(achievement.id) {
+            completed.append(achievement.id)
+            UserDefaults.standard.completedAchievements = completed
+            refreshAchievements()
+        }
     }
 
     // Load Name and Avatar from UserDefaults

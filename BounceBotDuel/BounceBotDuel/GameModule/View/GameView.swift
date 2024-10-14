@@ -214,7 +214,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     override func didMove(to view: SKView) {
         currentLevel = 1
-         requiredCoins = 1
+        requiredCoins = 1
         setupBackground()
         setupCapsule()
         setupObstaclesForLevel()
@@ -869,6 +869,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             collectedCoins += 1
             updateScore()
             playerHitCoin = true
+            playerCollectedCoin()
 
             let coinSoundAction = SKAction.playSoundFileNamed("coinSound.mp3", waitForCompletion: false)
             run(coinSoundAction)
@@ -914,12 +915,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     func showVictory() {
         if collectedCoins >= requiredCoins {
-            // Переход на следующий уровень
             winCallback?(collectedCoins)
             saveTotalCoins(collectedCoins)
             showWinBlock(coins: collectedCoins)
 
-            // Увеличиваем уровень и количество требуемых монет для следующего уровня
+            playerWonMatch() // Call this function when a match is won
+
             currentLevel += 1
             requiredCoins += 1
         }
@@ -936,5 +937,59 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     func updateScore() {
         playerScoreLabel.text = "\(playerScore)"
+    }
+    
+    func playerCollectedCoin() {
+        updateScore()
+        
+        // Check if the player has collected their first coin
+        if collectedCoins == 1 {
+            shopViewModel.completeAchievement(shopViewModel.achievements.first { $0.id == "first_coin" }!)
+        }
+
+        // If the required number of coins for the level is collected, show the victory
+        if collectedCoins >= requiredCoinsForLevel {
+            showVictory()
+        }
+    }
+    
+    func playerWonMatch() {
+        // This logic will be called when the player wins the match
+        shopViewModel.completeAchievement(shopViewModel.achievements.first { $0.id == "first_win" }!)
+    }
+    
+    func playerCoin() {
+
+        updateScore()
+        
+        // Check if the player has collected 5 coins in one game
+        if collectedCoins == 5 {
+            shopViewModel.completeAchievement(shopViewModel.achievements.first { $0.id == "collect_5_coins" }!)
+        }
+
+        // If the required number of coins for the level is collected, show the victory
+        if collectedCoins >= requiredCoinsForLevel {
+            showVictory()
+        }
+    }
+
+    var botWins = 0 // Add this to track bot wins
+
+    func playerWonMatch10() {
+        botWins += 1
+        
+        // Check if the player has defeated the bot 10 times
+        if botWins == 10 {
+            shopViewModel.completeAchievement(shopViewModel.achievements.first { $0.id == "win_10" }!)
+        }
+    }
+    
+    func playerWonMatch50() {
+        botWins += 1
+        
+        // Check if the player has defeated the bot 50 times
+        if botWins == 50 {
+            shopViewModel.completeAchievement(shopViewModel.achievements.first { $0.id == "win_50" }!)
+        }
     }
 }

@@ -30,7 +30,7 @@ struct MenuView: View {
             }
             .offset(x: 25)
             
-            NavigationLink(destination: EmptyView()) {
+            NavigationLink(destination: AchievementsView()) {
                 Image(.achievementsButton)
             }
             .offset(y: -10)
