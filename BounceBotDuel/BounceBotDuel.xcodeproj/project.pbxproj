@@ -7,18 +7,75 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6C1D45612CBBFE1A0053C59B /* ShopViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C1D45602CBBFE1A0053C59B /* ShopViewModel.swift */; };
+		6C1D45632CBBFE2D0053C59B /* ShopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C1D45622CBBFE2D0053C59B /* ShopView.swift */; };
+		6C1D45662CBC22530053C59B /* BallModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C1D45652CBC22530053C59B /* BallModel.swift */; };
+		6C1D45682CBC357E0053C59B /* BackgroundModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C1D45672CBC357E0053C59B /* BackgroundModel.swift */; };
+		6C1D456A2CBC3E550053C59B /* BallShopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C1D45692CBC3E550053C59B /* BallShopView.swift */; };
+		6C1D456C2CBC3E790053C59B /* BackgroundShopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C1D456B2CBC3E790053C59B /* BackgroundShopView.swift */; };
 		6C3A24462CB6E4EA007E723F /* BounceBotDuelApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24452CB6E4EA007E723F /* BounceBotDuelApp.swift */; };
-		6C3A24482CB6E4EA007E723F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24472CB6E4EA007E723F /* ContentView.swift */; };
 		6C3A244A2CB6E4F5007E723F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6C3A24492CB6E4F5007E723F /* Assets.xcassets */; };
 		6C3A244D2CB6E4F5007E723F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6C3A244C2CB6E4F5007E723F /* Preview Assets.xcassets */; };
+		6C3A24582CB70B76007E723F /* LaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24572CB70B76007E723F /* LaunchView.swift */; };
+		6C3A245B2CB70D04007E723F /* LaunchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A245A2CB70D04007E723F /* LaunchViewModel.swift */; };
+		6C3A24622CB70F18007E723F /* ChoicePlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24612CB70F18007E723F /* ChoicePlayerView.swift */; };
+		6C3A24672CB7130A007E723F /* SupercellMagic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6C3A24662CB7130A007E723F /* SupercellMagic.ttf */; };
+		6C3A246C2CB71404007E723F /* Fonts+Generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A246B2CB71404007E723F /* Fonts+Generated.swift */; };
+		6C3A246E2CB71424007E723F /* Font+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A246D2CB71424007E723F /* Font+Extension.swift */; };
+		6C3A24702CB717E9007E723F /* ChoicePlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A246F2CB717E9007E723F /* ChoicePlayerViewModel.swift */; };
+		6C3A24722CB71AEE007E723F /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24712CB71AEE007E723F /* Color+Extension.swift */; };
+		6C3A24752CB71FFF007E723F /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24742CB71FFF007E723F /* CustomTextField.swift */; };
+		6C3A24792CB726AB007E723F /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24782CB726AB007E723F /* MenuView.swift */; };
+		6C3A247D2CB7DDDB007E723F /* MenuViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A247C2CB7DDDB007E723F /* MenuViewModel.swift */; };
+		6C3A248D2CB83322007E723F /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A248C2CB83322007E723F /* SoundManager.swift */; };
+		6C3A24902CB833C1007E723F /* backgroundMusic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6C3A248F2CB833C1007E723F /* backgroundMusic.mp3 */; };
+		6C3A24962CB83817007E723F /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3A24952CB83817007E723F /* InfoView.swift */; };
+		6CAC65232CBC850F00EECB2D /* coinSound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6CAC65222CBC850E00EECB2D /* coinSound.mp3 */; };
+		6CAC65252CBC852E00EECB2D /* pinSound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6CAC65242CBC852E00EECB2D /* pinSound.mp3 */; };
+		6CAC652C2CBCA97C00EECB2D /* AchievementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CAC652B2CBCA97C00EECB2D /* AchievementsView.swift */; };
+		6CB6B8E42CBD20D20013EAED /* LevelsScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6CB6B8E12CBD20D10013EAED /* LevelsScene.sks */; };
+		6CB6B8E52CBD20D20013EAED /* LevelsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB6B8E22CBD20D10013EAED /* LevelsScene.swift */; };
+		6CB6B8E62CBD20D20013EAED /* LevelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB6B8E32CBD20D10013EAED /* LevelsView.swift */; };
+		6CB6B8E82CBD39D50013EAED /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB6B8E72CBD39D50013EAED /* GameScene.swift */; };
+		6CE28A852CB9A7870083F96D /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE28A842CB9A7870083F96D /* GameView.swift */; };
+		6CE28A882CB9AB600083F96D /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE28A872CB9AB5F0083F96D /* GameViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6C1D45602CBBFE1A0053C59B /* ShopViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopViewModel.swift; sourceTree = "<group>"; };
+		6C1D45622CBBFE2D0053C59B /* ShopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopView.swift; sourceTree = "<group>"; };
+		6C1D45652CBC22530053C59B /* BallModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BallModel.swift; sourceTree = "<group>"; };
+		6C1D45672CBC357E0053C59B /* BackgroundModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundModel.swift; sourceTree = "<group>"; };
+		6C1D45692CBC3E550053C59B /* BallShopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BallShopView.swift; sourceTree = "<group>"; };
+		6C1D456B2CBC3E790053C59B /* BackgroundShopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundShopView.swift; sourceTree = "<group>"; };
 		6C3A24422CB6E4EA007E723F /* BounceBotDuel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BounceBotDuel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C3A24452CB6E4EA007E723F /* BounceBotDuelApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BounceBotDuelApp.swift; sourceTree = "<group>"; };
-		6C3A24472CB6E4EA007E723F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6C3A24492CB6E4F5007E723F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6C3A244C2CB6E4F5007E723F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		6C3A24572CB70B76007E723F /* LaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchView.swift; sourceTree = "<group>"; };
+		6C3A245A2CB70D04007E723F /* LaunchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewModel.swift; sourceTree = "<group>"; };
+		6C3A24612CB70F18007E723F /* ChoicePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoicePlayerView.swift; sourceTree = "<group>"; };
+		6C3A24662CB7130A007E723F /* SupercellMagic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SupercellMagic.ttf; sourceTree = "<group>"; };
+		6C3A24682CB71327007E723F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6C3A246B2CB71404007E723F /* Fonts+Generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Fonts+Generated.swift"; sourceTree = "<group>"; };
+		6C3A246D2CB71424007E723F /* Font+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extension.swift"; sourceTree = "<group>"; };
+		6C3A246F2CB717E9007E723F /* ChoicePlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoicePlayerViewModel.swift; sourceTree = "<group>"; };
+		6C3A24712CB71AEE007E723F /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
+		6C3A24742CB71FFF007E723F /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
+		6C3A24782CB726AB007E723F /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
+		6C3A247C2CB7DDDB007E723F /* MenuViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewModel.swift; sourceTree = "<group>"; };
+		6C3A248C2CB83322007E723F /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
+		6C3A248F2CB833C1007E723F /* backgroundMusic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = backgroundMusic.mp3; sourceTree = "<group>"; };
+		6C3A24952CB83817007E723F /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
+		6CAC65222CBC850E00EECB2D /* coinSound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = coinSound.mp3; sourceTree = "<group>"; };
+		6CAC65242CBC852E00EECB2D /* pinSound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = pinSound.mp3; sourceTree = "<group>"; };
+		6CAC652B2CBCA97C00EECB2D /* AchievementsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementsView.swift; sourceTree = "<group>"; };
+		6CB6B8E12CBD20D10013EAED /* LevelsScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = LevelsScene.sks; sourceTree = "<group>"; };
+		6CB6B8E22CBD20D10013EAED /* LevelsScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelsScene.swift; sourceTree = "<group>"; };
+		6CB6B8E32CBD20D10013EAED /* LevelsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LevelsView.swift; path = "../../../../../../../Users/kirillmanuilenko/Downloads/BounceBotDuel 2/BounceBotDuel/BounceBotDuel/LevelsModule/View/LevelsView.swift"; sourceTree = "<group>"; };
+		6CB6B8E72CBD39D50013EAED /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
+		6CE28A842CB9A7870083F96D /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
+		6CE28A872CB9AB5F0083F96D /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +89,41 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6C1D455D2CBBFDB20053C59B /* ShopModule */ = {
+			isa = PBXGroup;
+			children = (
+				6C1D45642CBC223D0053C59B /* Model */,
+				6C1D455F2CBBFDCB0053C59B /* View */,
+				6C1D455E2CBBFDC10053C59B /* ViewModel */,
+			);
+			path = ShopModule;
+			sourceTree = "<group>";
+		};
+		6C1D455E2CBBFDC10053C59B /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				6C1D45602CBBFE1A0053C59B /* ShopViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		6C1D455F2CBBFDCB0053C59B /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6C1D45622CBBFE2D0053C59B /* ShopView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		6C1D45642CBC223D0053C59B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				6C1D45652CBC22530053C59B /* BallModel.swift */,
+				6C1D45672CBC357E0053C59B /* BackgroundModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		6C3A24392CB6E4EA007E723F = {
 			isa = PBXGroup;
 			children = (
@@ -51,8 +143,20 @@
 		6C3A24442CB6E4EA007E723F /* BounceBotDuel */ = {
 			isa = PBXGroup;
 			children = (
-				6C3A24452CB6E4EA007E723F /* BounceBotDuelApp.swift */,
-				6C3A24472CB6E4EA007E723F /* ContentView.swift */,
+				6C3A24532CB6E7D4007E723F /* App */,
+				6C3A24692CB71388007E723F /* Generated */,
+				6C3A248B2CB832BC007E723F /* Services */,
+				6C3A24542CB70B44007E723F /* LaunchModule */,
+				6C3A245C2CB70EE6007E723F /* ChoicePlayerModule */,
+				6C3A24762CB72697007E723F /* MenuModule */,
+				6C3A24912CB837D7007E723F /* InfoModule */,
+				6C3A24972CB845E4007E723F /* LevelsModule */,
+				6CE28A822CB9A7670083F96D /* GameModule */,
+				6C1D455D2CBBFDB20053C59B /* ShopModule */,
+				6CAC65282CBCA94A00EECB2D /* AchievementsModule */,
+				6C3A248E2CB833B1007E723F /* Music */,
+				6C3A24642CB712EF007E723F /* Helpers */,
+				6C3A24632CB712DD007E723F /* Fonts */,
 				6C3A24492CB6E4F5007E723F /* Assets.xcassets */,
 				6C3A244B2CB6E4F5007E723F /* Preview Content */,
 			);
@@ -67,6 +171,236 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		6C3A24532CB6E7D4007E723F /* App */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24682CB71327007E723F /* Info.plist */,
+				6C3A24452CB6E4EA007E723F /* BounceBotDuelApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		6C3A24542CB70B44007E723F /* LaunchModule */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24562CB70B62007E723F /* View */,
+				6C3A24592CB70CF0007E723F /* ViewModel */,
+			);
+			path = LaunchModule;
+			sourceTree = "<group>";
+		};
+		6C3A24562CB70B62007E723F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24572CB70B76007E723F /* LaunchView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		6C3A24592CB70CF0007E723F /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A245A2CB70D04007E723F /* LaunchViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		6C3A245C2CB70EE6007E723F /* ChoicePlayerModule */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24602CB70F04007E723F /* View */,
+				6C3A245D2CB70EF4007E723F /* ViewModel */,
+			);
+			path = ChoicePlayerModule;
+			sourceTree = "<group>";
+		};
+		6C3A245D2CB70EF4007E723F /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A246F2CB717E9007E723F /* ChoicePlayerViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		6C3A24602CB70F04007E723F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24612CB70F18007E723F /* ChoicePlayerView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		6C3A24632CB712DD007E723F /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24662CB7130A007E723F /* SupercellMagic.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		6C3A24642CB712EF007E723F /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24732CB71FF1007E723F /* CustomViews */,
+				6C3A24652CB712F7007E723F /* Extensions */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		6C3A24652CB712F7007E723F /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A246D2CB71424007E723F /* Font+Extension.swift */,
+				6C3A24712CB71AEE007E723F /* Color+Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		6C3A24692CB71388007E723F /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A246B2CB71404007E723F /* Fonts+Generated.swift */,
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
+		6C3A24732CB71FF1007E723F /* CustomViews */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24742CB71FFF007E723F /* CustomTextField.swift */,
+				6C1D45692CBC3E550053C59B /* BallShopView.swift */,
+				6C1D456B2CBC3E790053C59B /* BackgroundShopView.swift */,
+			);
+			path = CustomViews;
+			sourceTree = "<group>";
+		};
+		6C3A24762CB72697007E723F /* MenuModule */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24772CB726A0007E723F /* View */,
+				6C3A247B2CB7DDC5007E723F /* ViewModel */,
+			);
+			path = MenuModule;
+			sourceTree = "<group>";
+		};
+		6C3A24772CB726A0007E723F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24782CB726AB007E723F /* MenuView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		6C3A247B2CB7DDC5007E723F /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A247C2CB7DDDB007E723F /* MenuViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		6C3A248B2CB832BC007E723F /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A248C2CB83322007E723F /* SoundManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		6C3A248E2CB833B1007E723F /* Music */ = {
+			isa = PBXGroup;
+			children = (
+				6CAC65242CBC852E00EECB2D /* pinSound.mp3 */,
+				6CAC65222CBC850E00EECB2D /* coinSound.mp3 */,
+				6C3A248F2CB833C1007E723F /* backgroundMusic.mp3 */,
+			);
+			path = Music;
+			sourceTree = "<group>";
+		};
+		6C3A24912CB837D7007E723F /* InfoModule */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24922CB837F8007E723F /* View */,
+			);
+			path = InfoModule;
+			sourceTree = "<group>";
+		};
+		6C3A24922CB837F8007E723F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24952CB83817007E723F /* InfoView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		6C3A24972CB845E4007E723F /* LevelsModule */ = {
+			isa = PBXGroup;
+			children = (
+				6C3A24982CB845F4007E723F /* View */,
+			);
+			path = LevelsModule;
+			sourceTree = "<group>";
+		};
+		6C3A24982CB845F4007E723F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6CB6B8E12CBD20D10013EAED /* LevelsScene.sks */,
+				6CB6B8E22CBD20D10013EAED /* LevelsScene.swift */,
+				6CB6B8E32CBD20D10013EAED /* LevelsView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		6CAC65282CBCA94A00EECB2D /* AchievementsModule */ = {
+			isa = PBXGroup;
+			children = (
+				6CAC652A2CBCA96D00EECB2D /* View */,
+				6CAC65292CBCA96500EECB2D /* ViewModel */,
+			);
+			path = AchievementsModule;
+			sourceTree = "<group>";
+		};
+		6CAC65292CBCA96500EECB2D /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		6CAC652A2CBCA96D00EECB2D /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6CAC652B2CBCA97C00EECB2D /* AchievementsView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		6CE28A822CB9A7670083F96D /* GameModule */ = {
+			isa = PBXGroup;
+			children = (
+				6CE28A832CB9A7740083F96D /* View */,
+				6CE28A862CB9AB470083F96D /* ViewModel */,
+			);
+			path = GameModule;
+			sourceTree = "<group>";
+		};
+		6CE28A832CB9A7740083F96D /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6CE28A842CB9A7870083F96D /* GameView.swift */,
+				6CB6B8E72CBD39D50013EAED /* GameScene.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		6CE28A862CB9AB470083F96D /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				6CE28A872CB9AB5F0083F96D /* GameViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -77,6 +411,7 @@
 				6C3A243E2CB6E4EA007E723F /* Sources */,
 				6C3A243F2CB6E4EA007E723F /* Frameworks */,
 				6C3A24402CB6E4EA007E723F /* Resources */,
+				6C3A246A2CB713B0007E723F /* SwiftGen */,
 			);
 			buildRules = (
 			);
@@ -127,18 +462,68 @@
 			files = (
 				6C3A244D2CB6E4F5007E723F /* Preview Assets.xcassets in Resources */,
 				6C3A244A2CB6E4F5007E723F /* Assets.xcassets in Resources */,
+				6CAC65232CBC850F00EECB2D /* coinSound.mp3 in Resources */,
+				6C3A24902CB833C1007E723F /* backgroundMusic.mp3 in Resources */,
+				6CB6B8E42CBD20D20013EAED /* LevelsScene.sks in Resources */,
+				6C3A24672CB7130A007E723F /* SupercellMagic.ttf in Resources */,
+				6CAC65252CBC852E00EECB2D /* pinSound.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6C3A246A2CB713B0007E723F /* SwiftGen */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftGen;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftgen >/dev/null; then\n  swiftgen\nelse\n  echo \"warning: SwiftGen not installed, download it from https://github.com/SwiftGen/SwiftGen\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6C3A243E2CB6E4EA007E723F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6C3A24482CB6E4EA007E723F /* ContentView.swift in Sources */,
+				6C3A24622CB70F18007E723F /* ChoicePlayerView.swift in Sources */,
+				6C3A24582CB70B76007E723F /* LaunchView.swift in Sources */,
+				6C3A246E2CB71424007E723F /* Font+Extension.swift in Sources */,
 				6C3A24462CB6E4EA007E723F /* BounceBotDuelApp.swift in Sources */,
+				6CE28A882CB9AB600083F96D /* GameViewModel.swift in Sources */,
+				6CE28A852CB9A7870083F96D /* GameView.swift in Sources */,
+				6C3A246C2CB71404007E723F /* Fonts+Generated.swift in Sources */,
+				6C1D45612CBBFE1A0053C59B /* ShopViewModel.swift in Sources */,
+				6CB6B8E62CBD20D20013EAED /* LevelsView.swift in Sources */,
+				6C1D45662CBC22530053C59B /* BallModel.swift in Sources */,
+				6CB6B8E82CBD39D50013EAED /* GameScene.swift in Sources */,
+				6C3A24962CB83817007E723F /* InfoView.swift in Sources */,
+				6C3A248D2CB83322007E723F /* SoundManager.swift in Sources */,
+				6C1D456A2CBC3E550053C59B /* BallShopView.swift in Sources */,
+				6C3A247D2CB7DDDB007E723F /* MenuViewModel.swift in Sources */,
+				6CB6B8E52CBD20D20013EAED /* LevelsScene.swift in Sources */,
+				6C3A24792CB726AB007E723F /* MenuView.swift in Sources */,
+				6CAC652C2CBCA97C00EECB2D /* AchievementsView.swift in Sources */,
+				6C1D456C2CBC3E790053C59B /* BackgroundShopView.swift in Sources */,
+				6C1D45632CBBFE2D0053C59B /* ShopView.swift in Sources */,
+				6C3A24702CB717E9007E723F /* ChoicePlayerViewModel.swift in Sources */,
+				6C3A245B2CB70D04007E723F /* LaunchViewModel.swift in Sources */,
+				6C1D45682CBC357E0053C59B /* BackgroundModel.swift in Sources */,
+				6C3A24722CB71AEE007E723F /* Color+Extension.swift in Sources */,
+				6C3A24752CB71FFF007E723F /* CustomTextField.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,7 +659,9 @@
 				DEVELOPMENT_ASSET_PATHS = "\"BounceBotDuel/Preview Content\"";
 				DEVELOPMENT_TEAM = 7LVP8USRP3;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BounceBotDuel/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "BounceBot Duel\n";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -309,7 +696,9 @@
 				DEVELOPMENT_ASSET_PATHS = "\"BounceBotDuel/Preview Content\"";
 				DEVELOPMENT_TEAM = 7LVP8USRP3;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BounceBotDuel/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "BounceBot Duel\n";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
