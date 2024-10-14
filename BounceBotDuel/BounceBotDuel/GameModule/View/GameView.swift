@@ -9,29 +9,29 @@ import SpriteKit
 import SwiftUI
 import Combine
 
-
 struct GameView: View {
-    // MARK: - Property -
     @EnvironmentObject var soundManager: SoundManager
     @Environment(\.dismiss) var dismiss
     @State private var roundCoins = 0
     @State private var currentScene: GameScene?
 
+    var level: Int // Получаем уровень как параметр
+
     var scene: SKScene {
-         let scene = GameScene(soundManager: soundManager, shopViewModel: ShopViewModel(), winCallback: { coins in
-             roundCoins = coins
-         }, loseCallback: {})
-         
-         scene.dismissCallback = {
-             dismiss()
-         }
+        let scene = GameScene(soundManager: soundManager, shopViewModel: ShopViewModel(), winCallback: { coins in
+            roundCoins = coins
+        }, loseCallback: {})
 
-         scene.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-         scene.scaleMode = .resizeFill
-         return scene
-     }
+        scene.currentLevel = level // Устанавливаем уровень в сцене
+        scene.dismissCallback = {
+            dismiss()
+        }
 
-    // MARK: - Body -
+        scene.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        scene.scaleMode = .resizeFill
+        return scene
+    }
+
     var body: some View {
         ZStack {
             SpriteView(scene: scene)
@@ -42,7 +42,7 @@ struct GameView: View {
 }
 
 #Preview {
-    GameView()
+    GameView(level: 1)
         .environmentObject(SoundManager())
 }
 
@@ -213,7 +213,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
 
     override func didMove(to view: SKView) {
-        currentLevel = 1
         requiredCoins = 1
         setupBackground()
         setupCapsule()
@@ -225,6 +224,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         setupPlayerNameLabel()
         setupPauseButton()
         setupPlayerLives()
+        setupLevel()
         setupWinLoseBlocks()
         setupBlurAndDim()
         setupSettingsPanel()
@@ -914,15 +914,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     func showVictory() {
-        if collectedCoins >= requiredCoins {
+        // Проверяем, собрал ли игрок все необходимые монеты
+        if collectedCoins >= requiredCoinsForLevel {
+            // Вызов коллбека победы с количеством собранных монет
             winCallback?(collectedCoins)
+            
+            // Сохранение монет в UserDefaults
             saveTotalCoins(collectedCoins)
+            
+            // Отображаем экран победы
             showWinBlock(coins: collectedCoins)
 
-            playerWonMatch() // Call this function when a match is won
+            // Логика победы в матче
+            playerWonMatch()
 
-            currentLevel += 1
-            requiredCoins += 1
+            // Переход на следующий уровень
+            if currentLevel < maxLevel {
+                currentLevel += 1
+                requiredCoinsForLevel = currentLevel // Устанавливаем требуемое количество монет для нового уровня
+            } else {
+                print("Поздравляем! Все уровни завершены.")
+            }
+
         }
     }
 

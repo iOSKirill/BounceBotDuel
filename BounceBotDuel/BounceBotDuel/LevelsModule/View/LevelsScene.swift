@@ -8,6 +8,7 @@ class LevelsScene: SKScene {
     var initialMapPosition: CGPoint! // Сохраняем начальное положение карты
     var level10: SKSpriteNode!
     var background: SKSpriteNode!  // Используем существующий background из SKS
+    var levelSelectedCallback: ((Int) -> Void)?
 
     var lastTouchPosition: CGPoint?
 
@@ -60,23 +61,25 @@ class LevelsScene: SKScene {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let touch = touches.first {
-            let touchLocation = touch.location(in: self)
-            lastTouchPosition = touchLocation
-            if let node = atPoint(touchLocation) as? SKSpriteNode {
-                if node.name == "BackButton" {
-                    dismissCallback?()
-                } else if let levelName = node.name, levelName.starts(with: "level") {
-                    // Извлекаем номер уровня из имени узла (например, "level1" -> 1)
-                    if let levelNumberString = levelName.components(separatedBy: "level").last,
-                       let levelNumber = Int(levelNumberString) {
-                        let reversedLevelNumber = 11 - levelNumber // Переворачиваем последовательность
-                        print("Level \(reversedLevelNumber) pressed")
-                    }
-                }
-            }
-        }
-    }
+         if let touch = touches.first {
+             let touchLocation = touch.location(in: self)
+             lastTouchPosition = touchLocation
+             if let node = atPoint(touchLocation) as? SKSpriteNode {
+                 if node.name == "BackButton" {
+                     dismissCallback?()
+                 } else if let levelName = node.name, levelName.starts(with: "level") {
+                     if let levelNumberString = levelName.components(separatedBy: "level").last,
+                        let levelNumber = Int(levelNumberString) {
+                         let reversedLevelNumber = 11 - levelNumber // Переворачиваем последовательность
+                         print("Level \(reversedLevelNumber) pressed")
+                         
+                         // Вызываем коллбек для передачи уровня
+                         levelSelectedCallback?(reversedLevelNumber)
+                     }
+                 }
+             }
+         }
+     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let touch = touches.first, let lastTouch = lastTouchPosition {
