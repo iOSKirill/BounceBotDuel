@@ -97,6 +97,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var dimOverlay: SKSpriteNode?
     
     var dismissCallback: (() -> Void)?
+    
+    let maxLevel = 10
+    var requiredCoinsForLevel = 1
 
     struct PhysicsCategory {
         static let none: UInt32 = 0
@@ -114,6 +117,84 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         CGPoint(x: -1.5, y: 1.5), CGPoint(x: -0.5, y: 1.5), CGPoint(x: 0.5, y: 1.5), CGPoint(x: 1.5, y: 1.5),
         CGPoint(x: -2, y: 1), CGPoint(x: -1, y: 1), CGPoint(x: 0, y: 1), CGPoint(x: 1, y: 1), CGPoint(x: 2, y: 1)
     ]
+    
+    let level2RelativePins: [CGPoint] = [
+        CGPoint(x: -2, y: 3), CGPoint(x: -1, y: 3), CGPoint(x: 0, y: 3), CGPoint(x: 1, y: 3), CGPoint(x: 2, y: 3),
+        CGPoint(x: -1.5, y: 2.5), CGPoint(x: -0.5, y: 2.5), CGPoint(x: 0.5, y: 2.5), CGPoint(x: 1.5, y: 2.5),
+        CGPoint(x: -1, y: 2), CGPoint(x: 0, y: 2), CGPoint(x: 1, y: 2),
+        CGPoint(x: -1.5, y: 1.5), CGPoint(x: -0.5, y: 1.5), CGPoint(x: 0.5, y: 1.5), CGPoint(x: 1.5, y: 1.5)
+    ]
+
+
+    
+    let level3RelativePins: [CGPoint] = [
+        CGPoint(x: -2, y: 3), CGPoint(x: -1, y: 3), CGPoint(x: 0, y: 3), CGPoint(x: 1, y: 3),
+        CGPoint(x: -1.5, y: 2.5), CGPoint(x: -0.5, y: 2.5), CGPoint(x: 0.5, y: 2.5), CGPoint(x: 1.5, y: 2.5),
+        CGPoint(x: -2, y: 2), CGPoint(x: -1, y: 2), CGPoint(x: 0, y: 2), CGPoint(x: 1, y: 2),
+        CGPoint(x: -1.5, y: 1.5), CGPoint(x: -0.5, y: 1.5), CGPoint(x: 0.5, y: 1.5), CGPoint(x: 1.5, y: 1.5),
+        CGPoint(x: -2, y: 1), CGPoint(x: -1, y: 1), CGPoint(x: 0, y: 1), CGPoint(x: 1, y: 1)
+    ]
+
+    
+    let level4RelativePins: [CGPoint] = [
+        CGPoint(x: -2, y: 3), CGPoint(x: -1, y: 3), CGPoint(x: 0, y: 3), CGPoint(x: 1, y: 3), CGPoint(x: 2, y: 3),
+        CGPoint(x: -1.5, y: 2.5), CGPoint(x: -0.5, y: 2.5), CGPoint(x: 0.5, y: 2.5), CGPoint(x: 1.5, y: 2.5),
+        CGPoint(x: -2, y: 2), CGPoint(x: -1, y: 2), CGPoint(x: 0, y: 2), CGPoint(x: 1, y: 2),
+        CGPoint(x: -1.5, y: 1.5), CGPoint(x: -0.5, y: 1.5), CGPoint(x: 0.5, y: 1.5),
+        CGPoint(x: -1, y: 1), CGPoint(x: 0, y: 1), CGPoint(x: 1, y: 1)
+    ]
+
+    
+    let level5RelativePins: [CGPoint] = [
+        CGPoint(x: -2, y: 3), CGPoint(x: -1, y: 3), CGPoint(x: 0, y: 3), CGPoint(x: 1, y: 3),
+        CGPoint(x: -2, y: 2.5), CGPoint(x: -1, y: 2.5), CGPoint(x: 0, y: 2.5), CGPoint(x: 1, y: 2.5),
+        CGPoint(x: -1.5, y: 2), CGPoint(x: -0.5, y: 2), CGPoint(x: 0.5, y: 2), CGPoint(x: 1.5, y: 2),
+        CGPoint(x: -2, y: 1.5), CGPoint(x: -1, y: 1.5), CGPoint(x: 0, y: 1.5), CGPoint(x: 1, y: 1.5)
+    ]
+
+    
+    let level6RelativePins: [CGPoint] = [
+        CGPoint(x: -2, y: 3), CGPoint(x: -1, y: 3), CGPoint(x: 0, y: 3), CGPoint(x: 1, y: 3),
+        CGPoint(x: -1.5, y: 2.5), CGPoint(x: -0.5, y: 2.5), CGPoint(x: 0.5, y: 2.5),
+        CGPoint(x: -2, y: 2), CGPoint(x: -1, y: 2), CGPoint(x: 0, y: 2), CGPoint(x: 1, y: 2),
+        CGPoint(x: -1.5, y: 1.5), CGPoint(x: -0.5, y: 1.5), CGPoint(x: 0.5, y: 1.5), CGPoint(x: 1.5, y: 1.5)
+    ]
+
+    
+    let level7RelativePins: [CGPoint] = [
+        CGPoint(x: -2, y: 3), CGPoint(x: -1, y: 3), CGPoint(x: 0, y: 3), CGPoint(x: 1, y: 3),
+        CGPoint(x: -2, y: 2.5), CGPoint(x: -1, y: 2.5), CGPoint(x: 0, y: 2.5), CGPoint(x: 1, y: 2.5),
+        CGPoint(x: -1.5, y: 2), CGPoint(x: -0.5, y: 2), CGPoint(x: 0.5, y: 2),
+        CGPoint(x: -2, y: 1.5), CGPoint(x: -1, y: 1.5), CGPoint(x: 0, y: 1.5), CGPoint(x: 1, y: 1.5)
+    ]
+
+    
+    let level8RelativePins: [CGPoint] = [
+        CGPoint(x: -2, y: 3), CGPoint(x: -1, y: 3), CGPoint(x: 0, y: 3),
+        CGPoint(x: -2, y: 2.5), CGPoint(x: -1, y: 2.5), CGPoint(x: 0, y: 2.5),
+        CGPoint(x: -1.5, y: 2), CGPoint(x: -0.5, y: 2), CGPoint(x: 0.5, y: 2),
+        CGPoint(x: -2, y: 1.5), CGPoint(x: -1, y: 1.5), CGPoint(x: 0, y: 1.5),
+        CGPoint(x: -1.5, y: 1), CGPoint(x: -0.5, y: 1), CGPoint(x: 0.5, y: 1)
+    ]
+
+    
+    let level9RelativePins: [CGPoint] = [
+        CGPoint(x: -2, y: 3), CGPoint(x: -1, y: 3), CGPoint(x: 0, y: 3), CGPoint(x: 1, y: 3),
+        CGPoint(x: -1.5, y: 2.5), CGPoint(x: -0.5, y: 2.5), CGPoint(x: 0.5, y: 2.5),
+        CGPoint(x: -2, y: 2), CGPoint(x: -1, y: 2), CGPoint(x: 0, y: 2), CGPoint(x: 1, y: 2),
+        CGPoint(x: -1.5, y: 1.5), CGPoint(x: -0.5, y: 1.5), CGPoint(x: 0.5, y: 1.5)
+    ]
+
+
+    
+    let level10RelativePins: [CGPoint] = [
+        CGPoint(x: -2, y: 3), CGPoint(x: -1, y: 3), CGPoint(x: 0, y: 3), CGPoint(x: 1, y: 3),
+        CGPoint(x: -2, y: 2.5), CGPoint(x: -1, y: 2.5), CGPoint(x: 0, y: 2.5),
+        CGPoint(x: -1.5, y: 2), CGPoint(x: -0.5, y: 2), CGPoint(x: 0.5, y: 2),
+        CGPoint(x: -2, y: 1.5), CGPoint(x: -1, y: 1.5), CGPoint(x: 0, y: 1.5), CGPoint(x: 1, y: 1.5)
+    ]
+
+
 
     init(soundManager: SoundManager, shopViewModel: ShopViewModel, winCallback: @escaping (Int) -> Void, loseCallback: @escaping () -> Void) {
         self.soundManager = soundManager
@@ -126,8 +207,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    var currentLevel = 1
+    var requiredCoins = 1
+    
 
     override func didMove(to view: SKView) {
+        currentLevel = 1
+         requiredCoins = 1
         setupBackground()
         setupCapsule()
         setupObstaclesForLevel()
@@ -146,6 +233,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         physicsWorld.contactDelegate = self
     }
     
+    func restartLevel() {
+        resetGame()
+        requiredCoins = currentLevel
+    }
 
     func setupBlurAndDim() {
         blurBackground = SKEffectNode()
@@ -213,25 +304,37 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func showWinBlock(coins: Int) {
         blurBackground?.isHidden = false
         dimOverlay?.isHidden = false
-        
         winBlock?.isHidden = false
-        
+
+        // Удаляем предыдущие динамические элементы (монеты и метки)
+        winBlock?.children.forEach { node in
+            if node.name == "coin" || node.name == "coinLabel" {
+                node.removeFromParent()
+            }
+        }
+
+        // Создаем метку с количеством монет
         let coinLabel = SKLabelNode(fontNamed: "SupercellMagic")
-        coinLabel.text = "\(coins)"
+        coinLabel.text = "\(coins)"  // Выводим актуальное количество монет
         coinLabel.fontSize = 32
         coinLabel.fontColor = .cFFE500
-        
+        coinLabel.name = "coinLabel" // Присваиваем имя для будущего удаления
+        winBlock?.addChild(coinLabel)
+
+        // Создаем изображение монеты
         let coin = SKSpriteNode(imageNamed: "Coin")
         coin.setScale(1)
-        
-        let totalWidth = coin.size.width + coinLabel.frame.width + 10
-        
-        coin.position = CGPoint(x: -(totalWidth / 2) + coin.size.width / 2, y: -8)
+        coin.name = "coin" // Присваиваем имя для будущего удаления
         winBlock?.addChild(coin)
-        
+
+        // Рассчитываем общую ширину для правильного позиционирования
+        let totalWidth = coin.size.width + coinLabel.frame.width + 10
+
+        // Позиционируем монету и метку
+        coin.position = CGPoint(x: -(totalWidth / 2) + coin.size.width / 2, y: -8)
         coinLabel.position = CGPoint(x: coin.position.x + coin.size.width / 2 + 10 + coinLabel.frame.width / 2, y: -20)
-        winBlock?.addChild(coinLabel)
     }
+
 
     func showLoseBlock() {
         blurBackground?.isHidden = false
@@ -409,9 +512,46 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func setupObstaclesForLevel() {
         let screenWidth = self.size.width
         let maxPinsInRow = 5
-
-        let levelPins = generateLevelPins(relativePositions: level1RelativePins, screenWidth: screenWidth, maxPinsInRow: maxPinsInRow)
-
+        
+        let levelPins: [CGPoint]
+        
+        // Switch based on the current level
+        switch currentLevel {
+        case 1:
+            levelPins = generateLevelPins(relativePositions: level1RelativePins, screenWidth: screenWidth, maxPinsInRow: maxPinsInRow)
+        case 2:
+            levelPins = generateLevelPins(relativePositions: level2RelativePins, screenWidth: screenWidth, maxPinsInRow: maxPinsInRow)
+        case 3:
+            levelPins = generateLevelPins(relativePositions: level3RelativePins, screenWidth: screenWidth, maxPinsInRow: maxPinsInRow)
+        case 4:
+            levelPins = generateLevelPins(relativePositions: level4RelativePins, screenWidth: screenWidth, maxPinsInRow: maxPinsInRow)
+            
+        case 5:
+            levelPins = generateLevelPins(relativePositions: level5RelativePins, screenWidth: screenWidth, maxPinsInRow: maxPinsInRow)
+            
+        case 6:
+            levelPins = generateLevelPins(relativePositions: level6RelativePins, screenWidth: screenWidth, maxPinsInRow: maxPinsInRow)
+            
+        case 7:
+            levelPins = generateLevelPins(relativePositions: level7RelativePins, screenWidth: screenWidth, maxPinsInRow: maxPinsInRow)
+            
+        case 8:
+            levelPins = generateLevelPins(relativePositions: level8RelativePins, screenWidth: screenWidth, maxPinsInRow: maxPinsInRow)
+            
+        case 9:
+            levelPins = generateLevelPins(relativePositions: level9RelativePins, screenWidth: screenWidth, maxPinsInRow: maxPinsInRow)
+            
+        case 10:
+            levelPins = generateLevelPins(relativePositions: level10RelativePins, screenWidth: screenWidth, maxPinsInRow: maxPinsInRow)
+        // Add more levels similarly
+        default:
+            levelPins = generateLevelPins(relativePositions: level1RelativePins, screenWidth: screenWidth, maxPinsInRow: maxPinsInRow)
+        }
+        
+        // Clear existing obstacles
+        obstacles.forEach { $0.removeFromParent() }
+        obstacles.removeAll()
+        
         for position in levelPins {
             let peg = SKSpriteNode(imageNamed: "Pin")
             peg.size = CGSize(width: 20, height: 28)
@@ -425,6 +565,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             obstacles.append(peg)
         }
     }
+
+    func setupLevel() {
+        requiredCoinsForLevel = currentLevel
+        resetGame()
+    }
+    
+    
+    func handleNextLevel() {
+        if currentLevel < maxLevel {
+            currentLevel += 1
+            requiredCoinsForLevel = currentLevel
+            setupLevel()
+        } else {
+            print("Поздравляем! Вы завершили все уровни.")
+        }
+    }
+
 
     func setupCoinForLevel() {
         let randomIndex = Int.random(in: 0..<obstacles.count)
@@ -534,17 +691,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let dy = (coin.position.y - playerBall.position.y) * 0.03
             playerBall.physicsBody?.applyImpulse(CGVector(dx: dx, dy: dy))
         }
+        
+        let shouldBotMiss = Int.random(in: 1...3) == 3
 
-        // Bot logic
-        let shouldBotHit = Int.random(in: 1...3) == 3
-
-        if shouldBotHit {
-            let dx = (coin.position.x - botBall.position.x) * 0.03 + botRandomSpeedX
-            let dy = (coin.position.y - botBall.position.y) * 0.02
-            botBall.physicsBody?.applyImpulse(CGVector(dx: dx, dy: dy))
+        if shouldBotMiss {
+            let dx = (coin.position.x - playerBall.position.x) * 0.03 + botRandomSpeedX
+            let dy = (coin.position.y - playerBall.position.y) * 0.02
+            playerBall.physicsBody?.applyImpulse(CGVector(dx: dx, dy: dy))
         } else {
-            botBall.physicsBody?.applyImpulse(CGVector(dx: botRandomSpeedX, dy: -5))
+            playerBall.physicsBody?.applyImpulse(CGVector(dx: botRandomSpeedX, dy: -5))
         }
+
     }
 
     func showSettingsPanel() {
@@ -595,9 +752,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ballInPlay = false
     }
 
-     func restartLevel() {
-         resetGame()
-     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
@@ -620,7 +774,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             } else if  node.name == "levelHomeButton" {
                 dismissCallback?()
             } else if node.name == "levelNextButton" {
-
+                handleNextLevel()
             } else if node.name == "levelRestartButton" {
                 restartLevel()
             } else {
@@ -759,9 +913,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     func showVictory() {
-        winCallback?(collectedCoins)
-        saveTotalCoins(collectedCoins)
-        showWinBlock(coins: collectedCoins)
+        if collectedCoins >= requiredCoins {
+            // Переход на следующий уровень
+            winCallback?(collectedCoins)
+            saveTotalCoins(collectedCoins)
+            showWinBlock(coins: collectedCoins)
+
+            // Увеличиваем уровень и количество требуемых монет для следующего уровня
+            currentLevel += 1
+            requiredCoins += 1
+        }
     }
 
     func showGameOver() {
