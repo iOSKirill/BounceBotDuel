@@ -177,4 +177,5 @@ struct ShopView: View {
 
 #Preview {
     ShopView()
+        .environmentObject(ShopViewModel())
 }

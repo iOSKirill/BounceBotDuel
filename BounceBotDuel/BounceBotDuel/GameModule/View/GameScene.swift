@@ -359,7 +359,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func setupPlayerNameLabel() {
         let avatarBackground = SKSpriteNode(imageNamed: "Block3")
         avatarBackground.size = CGSize(width: 60, height: 60)
-        avatarBackground.position = CGPoint(x: size.width * 0.1, y: size.height - 170)
+        avatarBackground.position = CGPoint(x: 50, y: size.height < 760 ? size.height * 0.8 : size.height * 0.83)
         addChild(avatarBackground)
         
         let playerAvatarTexture = SKTexture(imageNamed: viewModel.playerAvatar)
@@ -387,14 +387,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func setupScoreBoard() {
         scoreBoard = SKSpriteNode(imageNamed: "Block6")
-        scoreBoard.position = CGPoint(x: size.width * 0.23, y: size.height - 100)
+        scoreBoard.position = CGPoint(x: 108, y: size.height * 0.9)
         scoreBoard.setScale(1.1)
         addChild(scoreBoard)
     }
     
     func setupScoreLabel() {
         let scoreCoinImage = SKSpriteNode(imageNamed: "Coin")
-        scoreCoinImage.position = CGPoint(x: size.width * 0.1, y: size.height - 105)
+        scoreCoinImage.position = CGPoint(x: 55, y: size.height < 760 ? size.height * 0.892 : size.height * 0.895)
         scoreCoinImage.setScale(0.6)
         scoreCoinImage.zPosition = 2
         addChild(scoreCoinImage)
@@ -403,7 +403,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         playerScoreLabel.text = "\(playerScore)"
         playerScoreLabel.fontSize = 16
         playerScoreLabel.fontColor = .cFFE500
-        playerScoreLabel.position = CGPoint(x: size.width * 0.148, y: size.height - 111)
+        playerScoreLabel.position = CGPoint(x: 75, y: size.height < 760 ? size.height * 0.884 :  size.height * 0.888)
         playerScoreLabel.zPosition = 2
         addChild(playerScoreLabel)
     }
@@ -413,15 +413,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         botScoreLabel.text = "\(botScore)"
         botScoreLabel.fontSize = 16
         botScoreLabel.fontColor = .c00D1FF
-        botScoreLabel.position = CGPoint(x: size.width * 0.325, y: size.height - 111)
+        botScoreLabel.position = CGPoint(x:150, y: size.height < 760 ? size.height * 0.884 : size.height * 0.888)
         addChild(botScoreLabel)
     }
 
- 
-
     func setupPauseButton() {
         pauseButton = SKSpriteNode(imageNamed: "PauseButton")
-        pauseButton.position = CGPoint(x: size.width - 50, y: size.height - 100)
+        pauseButton.position = CGPoint(x: size.width - 50, y: size.height * 0.9)
         pauseButton.name = "pauseButton"
         pauseButton.zPosition = 4
         addChild(pauseButton)
@@ -485,7 +483,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     func setupCapsule() {
         capsule = SKSpriteNode(imageNamed: "Pipe")
-        capsule.position = CGPoint(x: size.width / 2, y: size.height / 1.4)
+        capsule.position = CGPoint(x: size.width / 2, y: size.height / 1.5)
         addChild(capsule)
     }
 
@@ -493,7 +491,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let pinSpacingX = screenWidth / CGFloat(maxPinsInRow + 0)
         let pinSpacingY = pinSpacingX * 1.2
         let centerX = screenWidth / 2
-        let centerY = size.height / 4.2
+        let centerY = size.height < 760 ? size.height / 10 : size.height / 6
+        
+        print(size.height)
 
         return relativePositions.map { relativePos in
             let x = centerX + relativePos.x * pinSpacingX
@@ -625,7 +625,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func setupPlayerLives() {
         lifeIndicator = SKSpriteNode(imageNamed: "Life3")
         lifeIndicator.size = CGSize(width: 90, height: 10)
-        lifeIndicator.position = CGPoint(x: playerNameLabel.position.x + 17, y: size.height - 185)
+        lifeIndicator.position = CGPoint(x: playerNameLabel.position.x + 17, y: size.height < 760 ? size.height * 0.78 : size.height * 0.82)
         addChild(lifeIndicator)
     }
     
