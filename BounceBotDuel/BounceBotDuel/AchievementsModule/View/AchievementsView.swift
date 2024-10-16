@@ -14,14 +14,6 @@ struct Achievement: Identifiable {
     var isCompleted: Bool
 }
 
-extension UserDefaults {
-    private var achievementsKey: String { "completedAchievements" }
-    
-    var completedAchievements: [String] {
-        get { UserDefaults.standard.array(forKey: achievementsKey) as? [String] ?? [] }
-        set { UserDefaults.standard.set(newValue, forKey: achievementsKey) }
-    }
-}
 
 struct AchievementsView: View {
     // MARK: - Property -

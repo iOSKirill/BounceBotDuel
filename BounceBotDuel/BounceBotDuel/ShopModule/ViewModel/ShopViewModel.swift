@@ -10,6 +10,15 @@ import Combine
 import UIKit
 import SwiftUI
 
+extension UserDefaults {
+    private var achievementsKey: String { "completedAchievements" }
+    
+    var completedAchievements: [String] {
+        get { UserDefaults.standard.array(forKey: achievementsKey) as? [String] ?? [] }
+        set { UserDefaults.standard.set(newValue, forKey: achievementsKey) }
+    }
+}
+
 class ShopViewModel: ObservableObject {
     // MARK: - Properties -
     @Published var playerName: String = "Player"
@@ -54,7 +63,7 @@ class ShopViewModel: ObservableObject {
         loadBallData()
         loadBackgroundData() // Load backgrounds
     }
-    
+ 
     
     func refreshAchievements() {
         let completedIDs = UserDefaults.standard.completedAchievements
@@ -65,11 +74,17 @@ class ShopViewModel: ObservableObject {
         }
     }
     
+    func isAchievementCompleted(id: String) -> Bool {
+        return UserDefaults.standard.completedAchievements.contains(id)
+    }
+
     func completeAchievement(_ achievement: Achievement) {
-        var completed = UserDefaults.standard.completedAchievements
-        if !completed.contains(achievement.id) {
-            completed.append(achievement.id)
-            UserDefaults.standard.completedAchievements = completed
+        var completedAchievements = UserDefaults.standard.completedAchievements
+        if !completedAchievements.contains(achievement.id) {
+            // Добавляем ачивку в список выполненных
+            completedAchievements.append(achievement.id)
+            UserDefaults.standard.completedAchievements = completedAchievements
+            // Обновляем список ачивок
             refreshAchievements()
         }
     }

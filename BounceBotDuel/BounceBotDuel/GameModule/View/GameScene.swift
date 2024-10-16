@@ -948,24 +948,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func playerCollectedCoin() {
         updateScore()
         
-        // Check if the player has collected their first coin
+        // Проверяем, если ачивка "first_coin" уже выполнена
         if collectedCoins == 1 {
-            shopViewModel.completeAchievement(shopViewModel.achievements.first { $0.id == "first_coin" }!)
-            // Добавляем 15 монет за выполнение ачивки
-            saveTotalCoins(15)
+            // Проверяем, выполнена ли ачивка
+            if !shopViewModel.isAchievementCompleted(id: "first_coin") {
+                // Завершаем ачивку и добавляем монеты
+                shopViewModel.completeAchievement(shopViewModel.achievements.first { $0.id == "first_coin" }!)
+                // Добавляем монеты только один раз
+                saveTotalCoins(15)
+            }
         }
 
-        // If the required number of coins for the level is collected, show the victory
+        // Если собраны все необходимые монеты для уровня, показываем победу
         if collectedCoins >= requiredCoinsForLevel {
             showVictory()
         }
     }
-    
+
     func playerWonMatch() {
-        // This logic will be called when the player wins the match
-        shopViewModel.completeAchievement(shopViewModel.achievements.first { $0.id == "first_win" }!)
-        // Добавляем 15 монет за выполнение ачивки
-        saveTotalCoins(15)
+        // Проверяем, если ачивка "first_win" уже выполнена
+        if !shopViewModel.isAchievementCompleted(id: "first_win") {
+            // Завершаем ачивку и добавляем монеты
+            shopViewModel.completeAchievement(shopViewModel.achievements.first { $0.id == "first_win" }!)
+            // Добавляем монеты только один раз
+            saveTotalCoins(15)
+        }
     }
     
     func playerCoin() {

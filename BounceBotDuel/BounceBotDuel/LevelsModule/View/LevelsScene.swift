@@ -18,6 +18,10 @@ class LevelsScene: SKScene {
     override func didMove(to view: SKView) {
         // Устанавливаем фон
         setupBackground()
+        
+        if let button = self.childNode(withName: "BackButton") as? SKSpriteNode {
+            button.position = CGPoint(x: 140, y: size.height * 0.4)
+        }
 
         // Получаем levelMap из SKS файла
         if let map = self.childNode(withName: "levelMap") as? SKSpriteNode {
