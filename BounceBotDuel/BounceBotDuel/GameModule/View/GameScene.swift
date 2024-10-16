@@ -951,6 +951,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Check if the player has collected their first coin
         if collectedCoins == 1 {
             shopViewModel.completeAchievement(shopViewModel.achievements.first { $0.id == "first_coin" }!)
+            // Добавляем 15 монет за выполнение ачивки
+            saveTotalCoins(15)
         }
 
         // If the required number of coins for the level is collected, show the victory
@@ -962,6 +964,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func playerWonMatch() {
         // This logic will be called when the player wins the match
         shopViewModel.completeAchievement(shopViewModel.achievements.first { $0.id == "first_win" }!)
+        // Добавляем 15 монет за выполнение ачивки
+        saveTotalCoins(15)
     }
     
     func playerCoin() {
