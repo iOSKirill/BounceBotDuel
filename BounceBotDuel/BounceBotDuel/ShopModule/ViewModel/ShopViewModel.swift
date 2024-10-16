@@ -175,12 +175,12 @@ class ShopViewModel: ObservableObject {
             let isSelected = selectedBackgroundId == i
             
             // Set first background as purchased and selected by default
-            if i == 1 && !isPurchased {
-                UserDefaults.standard.set(true, forKey: "\(purchasedBackgroundsKey)_1")
-                UserDefaults.standard.set(1, forKey: selectedBackgroundKey)
+            if i == 1 {
+                UserDefaults.standard.set(true, forKey: "\(purchasedBackgroundsKey)_1") // Первая обои всегда куплена
+                UserDefaults.standard.set(1, forKey: selectedBackgroundKey) // Первая обои всегда выбрана по умолчанию
             }
             
-            backgrounds.append(Background(id: i, imageName: "Background\(i)", isPurchased: isPurchased, isSelected: isSelected))
+            backgrounds.append(Background(id: i, imageName: "Background\(i)", isPurchased: i == 1 || isPurchased, isSelected: i == 1 || isSelected))
         }
 
         // Update the selected background image based on the UserDefaults value
