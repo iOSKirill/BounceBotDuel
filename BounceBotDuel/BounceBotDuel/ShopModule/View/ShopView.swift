@@ -138,10 +138,10 @@ struct ShopView: View {
                                         BallShopView(viewModel: viewModel, ball: ball)
                                     }
                                 }
+                                .padding(.bottom, UIScreen.main.bounds.width <= 667 ?  90 : 32)
                             }
                             .padding(.top, 32)
-                            .padding(.horizontal, 40)
-                            .padding(.bottom, UIScreen.main.bounds.width <= 667 ? geometry.safeAreaInsets.bottom + 32 : geometry.safeAreaInsets.bottom + 90)
+                            .padding(.horizontal, UIScreen.main.bounds.width <= 667 ? 16 : 40)
                                 
                         } else {
                             ScrollView(showsIndicators: false) {
@@ -157,10 +157,10 @@ struct ShopView: View {
                                         BackgroundShopView(viewModel: viewModel, background: background)
                                     }
                                 }
+                                .padding(.bottom, UIScreen.main.bounds.width <= 667 ?  90 : 32)
                             }
                             .padding(.top, 32)
-                            .padding(.horizontal, 40)
-                            .padding(.bottom, UIScreen.main.bounds.width <= 667 ? geometry.safeAreaInsets.bottom + 32 : geometry.safeAreaInsets.bottom + 90)
+                            .padding(.horizontal, UIScreen.main.bounds.width <= 667 ? 16 : 40)
                         }
                         
                         Spacer()
