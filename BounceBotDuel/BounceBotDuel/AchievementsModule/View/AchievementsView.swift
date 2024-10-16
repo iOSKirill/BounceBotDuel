@@ -117,6 +117,7 @@ struct AchievementsView: View {
                             .padding(.bottom, 32)
                         }
                         .padding(.top, 52)
+                        .padding(.bottom, UIScreen.main.bounds.height <= 667 ? 90 : 32)
                         
                         Spacer()
                     }
@@ -125,6 +126,7 @@ struct AchievementsView: View {
         }
         .onAppear {
             viewModel.refreshAchievements()
+            viewModel.refreshCoinCount()
         }
         .navigationBarBackButtonHidden(true)
     }

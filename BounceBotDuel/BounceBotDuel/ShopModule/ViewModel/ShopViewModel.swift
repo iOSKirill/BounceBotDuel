@@ -87,7 +87,9 @@ class ShopViewModel: ObservableObject {
     
     // Save coin count to UserDefaults
     func updateCoinCount(_ newCount: Int) {
-        coinCount = newCount
+        DispatchQueue.main.async {
+            self.coinCount = newCount
+        }
         saveCoinCount()
     }
 
