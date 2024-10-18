@@ -13,31 +13,53 @@ class SoundManager: ObservableObject {
     static let shared = SoundManager()
     
     var player: AVAudioPlayer?
-    @Published var isSoundOn: Bool = true
+    @Published var isSoundOn: Bool {
+        didSet {
+            saveSoundState()
+            // Если состояние изменилось, сразу обновляем воспроизведение
+            handleMusicPlayback()
+        }
+    }
     
-    init() {}
+    init() {
+        // Загружаем сохраненное состояние звука
+        isSoundOn = UserDefaults.standard.bool(forKey: "isSoundOn")
+        
+        // Настраиваем аудиоплеер
+        setupPlayer()
+        
+        // Запускаем или останавливаем музыку в зависимости от сохраненного состояния
+        handleMusicPlayback()
+    }
     
-    // Play music game
-    func playBackgroundMusic() {
+    // Настраиваем аудиоплеер
+    private func setupPlayer() {
         guard let url = Bundle.main.url(forResource: "backgroundMusic", withExtension: "mp3") else { return }
         
         do {
             player = try AVAudioPlayer(contentsOf: url)
             player?.numberOfLoops = -1
-            player?.play()
         } catch {
-            print("Не удалось воспроизвести музыку: \(error.localizedDescription)")
+            print("Не удалось настроить плеер: \(error.localizedDescription)")
+        }
+    }
+    
+    // Запускаем или останавливаем музыку в зависимости от состояния
+    func handleMusicPlayback() {
+        if isSoundOn {
+            player?.play()
+        } else {
+            player?.pause()
         }
     }
     
     // Music toggle
     func toggleSound() {
         isSoundOn.toggle()
-        
-        if isSoundOn {
-            player?.play()
-        } else {
-            player?.pause()
-        }
+    }
+    
+    // Save sound state to UserDefaults
+    private func saveSoundState() {
+        UserDefaults.standard.set(isSoundOn, forKey: "isSoundOn")
     }
 }

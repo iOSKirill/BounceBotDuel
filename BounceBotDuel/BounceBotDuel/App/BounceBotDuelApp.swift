@@ -20,7 +20,7 @@ struct BounceBotDuelApp: App {
                 .environmentObject(soundManager)
                 .environmentObject(viewModel)
                 .onAppear {
-                    soundManager.playBackgroundMusic()
+                    soundManager.handleMusicPlayback()
                 }
         }
     }
