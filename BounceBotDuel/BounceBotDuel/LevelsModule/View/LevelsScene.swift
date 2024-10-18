@@ -26,7 +26,13 @@ class LevelsScene: SKScene {
         // Получаем levelMap из SKS файла
         if let map = self.childNode(withName: "levelMap") as? SKSpriteNode {
             levelMap = map
-            initialMapPosition = levelMap.position // Сохраняем начальное положение карты
+
+            // Устанавливаем позицию levelMap в зависимости от высоты экрана
+            let yPos = size.height < 760 ? size.height - 900 : size.height - 1050
+            levelMap.position = CGPoint(x: levelMap.position.x, y: yPos)
+            
+            // Сохраняем начальное положение карты
+            initialMapPosition = levelMap.position
         } else {
             print("levelMap не найден в SKS")
         }
@@ -43,6 +49,7 @@ class LevelsScene: SKScene {
             }
         }
     }
+
     
     func setupBackground() {
         // Проверяем, что shopViewModel не равен nil
@@ -88,6 +95,8 @@ class LevelsScene: SKScene {
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let touch = touches.first, let lastTouch = lastTouchPosition {
             let touchLocation = touch.location(in: self)
+            
+            // Используем прямой расчет dy
             let dy = touchLocation.y - lastTouch.y
 
             // Рассчитываем новую позицию карты
@@ -102,6 +111,7 @@ class LevelsScene: SKScene {
         }
     }
 
+
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         lastTouchPosition = nil
     }
@@ -109,19 +119,22 @@ class LevelsScene: SKScene {
     func canMoveMap(newYPosition: CGFloat) -> Bool {
         // Получаем позицию level10 относительно сцены
         let level10PositionInScene = levelMap.convert(level10.position, to: self)
-        let bottomOfLevel10InScene = level10PositionInScene.y - level10.size.height / 2
+        let topOfLevel10InScene = level10PositionInScene.y + level10.size.height / 2
 
-        // Проверяем, чтобы карта не поднималась выше начальной позиции
-        let canMoveUp = newYPosition <= initialMapPosition.y
+        // Проверяем позицию нижнего уровня (level1) относительно сцены
+        if let level1 = levelMap.childNode(withName: "level1") as? SKSpriteNode {
+            let level1PositionInScene = levelMap.convert(level1.position, to: self)
+            let bottomOfLevel1InScene = level1PositionInScene.y - level1.size.height / 2
+            
+            // Проверяем, чтобы карта не опускалась слишком низко, оставляя level1 видимым
+            let canMoveDown = bottomOfLevel1InScene < frame.maxY
+            
+            // Проверяем, чтобы карта не поднималась выше начальной позиции
+            let canMoveUp = topOfLevel10InScene > frame.minY
 
-        // Ограничиваем карту так, чтобы level10 оставался видимым
-        let level10TopVisible = bottomOfLevel10InScene > frame.minY
-
-        // Допускаем скролл до максимальной позиции, но не дальше
-        let upperLimit = frame.height / 2 + 50 // Ограничение, чтобы карта не ушла слишком далеко вверх
-        let canMoveFarUp = newYPosition >= (initialMapPosition.y - upperLimit)
-
-        return canMoveUp && level10TopVisible && canMoveFarUp
+            return canMoveUp && canMoveDown
+        }
+        
+        return false
     }
 }
-
